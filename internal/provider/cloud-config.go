@@ -1,0 +1,137 @@
+package provider
+
+import (
+	"context"
+	"maps"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	ccmodules "github.com/opa-oz/terraform-provider-cloud-config/internal/cc-modules"
+)
+
+var _ resource.Resource = &CloudConfigResource{}
+
+// var _ resource.ResourceWithImportState = &CloudConfigResource{}
+
+func NewCloudConfigResource() resource.Resource {
+	return &CloudConfigResource{}
+}
+
+type CloudConfigResource struct {
+}
+
+type CloudConfigResourceModel struct {
+	Content types.String `tfsdk:"content"`
+
+	ccmodules.SetHostnameModel
+}
+
+func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName
+}
+
+func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	schema := schema.Schema{
+		MarkdownDescription: "Cloud-config file in-memory representation", // NOTE: https://github.com/nobbs/terraform-provider-sops/blob/main/internal/provider/file_function.go
+
+		Attributes: map[string]schema.Attribute{
+			"content": schema.StringAttribute{
+				Computed:            true,
+				Sensitive:           true,
+				MarkdownDescription: "YAML content of cloud-init file",
+			},
+		},
+	}
+
+	flat_modules := []ccmodules.CCModuleFlat{
+		ccmodules.SetHostname(),
+	}
+
+	for _, module := range flat_modules {
+		maps.Insert(schema.Attributes, maps.All(module.Attributes()))
+	}
+	resp.Schema = schema
+}
+func (r *CloudConfigResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
+}
+
+func (r *CloudConfigResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var data CloudConfigResourceModel
+
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Write logs using the tflog package
+	// Documentation: https://terraform.io/plugin/log
+	tflog.Trace(ctx, "created a resource")
+
+	content, err := ExportContent(data)
+	if err != nil {
+		tflog.Error(ctx, err.Error())
+		return
+	}
+
+	data.Content = types.StringValue(content)
+
+	// Save data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudConfigResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data CloudConfigResourceModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudConfigResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var data CloudConfigResourceModel
+
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	content, err := ExportContent(data)
+	if err != nil {
+		tflog.Error(ctx, err.Error())
+		return
+	}
+
+	data.Content = types.StringValue(content)
+
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var data CloudConfigResourceModel
+
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+
+// func (r *CloudConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+// 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+// }
