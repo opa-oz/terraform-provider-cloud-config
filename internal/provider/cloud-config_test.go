@@ -62,6 +62,7 @@ timezone: Asia/two
 runcmd:
     - echo '11'
     - cat two
+manage_etc_hosts: localhost
               `)),
 					),
 				},
@@ -85,6 +86,8 @@ resource "cloud-config" "test" {
   timezone = "Asia/%[1]s"
 
 	runcmd = ["echo '11'", "cat %[1]s"]
+
+	manage_etc_hosts_localhost = true
 }
 `, configurableAttribute)
 }

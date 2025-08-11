@@ -4,6 +4,8 @@ import (
 	"context"
 	"maps"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -29,13 +31,15 @@ type CloudConfigResourceModel struct {
 	ccmodules.LocaleModel
 	ccmodules.TimezoneModel
 	ccmodules.RunCMDModule
+	ccmodules.UpdateEtcHostsModule
 }
 
 type ExportModel struct {
-	ccmodules.SetHostnameOutputModel `yaml:",inline"`
-	ccmodules.LocaleOutputModel      `yaml:",inline"`
-	ccmodules.TimezoneOutputModel    `yaml:",inline"`
-	ccmodules.RunCMDOutputModule     `yaml:",inline"`
+	ccmodules.SetHostnameOutputModel     `yaml:",inline"`
+	ccmodules.LocaleOutputModel          `yaml:",inline"`
+	ccmodules.TimezoneOutputModel        `yaml:",inline"`
+	ccmodules.RunCMDOutputModule         `yaml:",inline"`
+	ccmodules.UpdateEtcHostsOutputModule `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,6 +64,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.Locale(),
 		ccmodules.Timezone(),
 		ccmodules.RunCMD(),
+		ccmodules.UpdateEtcHosts(),
 	}
 
 	for _, module := range flat_modules {
@@ -147,10 +152,10 @@ func (r *CloudConfigResource) Delete(ctx context.Context, req resource.DeleteReq
 
 func (r *CloudConfigResource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{
-		// resourcevalidator.Conflicting(
-		// 	path.MatchRoot("runcmd"),
-		// 	path.MatchRoot("runcmds"),
-		// ),
+		resourcevalidator.Conflicting(
+			path.MatchRoot("manage_etc_hosts"),
+			path.MatchRoot("manage_etc_hosts_localhost"),
+		),
 	}
 }
 

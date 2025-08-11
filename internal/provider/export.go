@@ -44,8 +44,14 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 			}
 			output.RunCMD = cmds
 		}
-
 	}
+
+	if model.ManageEtcHostsLocalhost.ValueBool() {
+		output.ManageEtcHosts = "localhost"
+	} else {
+		output.ManageEtcHosts = model.ManageEtcHosts.ValueBool()
+	}
+
 	return output, nil
 }
 
