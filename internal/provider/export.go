@@ -1,8 +1,11 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 
 	"gopkg.in/yaml.v3"
 )
@@ -11,7 +14,7 @@ const (
 	hat = "#cloud-config"
 )
 
-func transform(model CloudConfigResourceModel) ExportModel {
+func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
 	output.Hostname = model.Hostname.ValueString()
@@ -29,14 +32,34 @@ func transform(model CloudConfigResourceModel) ExportModel {
 
 	output.Timezone = model.Timezone.ValueString()
 
-	return output
+	if !model.RunCMD.IsUnknown() {
+		elems := model.RunCMD.Elements()
+
+		if len(elems) > 0 {
+			cmds := make([]string, len(elems))
+			diagnostics := model.RunCMD.ElementsAs(ctx, &cmds, false)
+
+			if diagnostics.HasError() {
+				return output, diagnostics
+			}
+			output.RunCMD = cmds
+		}
+
+	}
+	return output, nil
 }
 
-func ExportContent(model CloudConfigResourceModel) (string, error) {
-	yaml, err := yaml.Marshal(transform(model))
+func ExportContent(ctx context.Context, model CloudConfigResourceModel) (string, diag.Diagnostics) {
+	output, diagnostics := transform(ctx, model)
+	if diagnostics != nil {
+		return "", diagnostics
+	}
+	yaml, err := yaml.Marshal(output)
 
 	if err != nil {
-		return "", err
+		return "", diag.Diagnostics{
+			diag.NewErrorDiagnostic("Cannot marshal YAML", err.Error()),
+		}
 	}
 
 	return strings.TrimSpace(fmt.Sprintf(`%s

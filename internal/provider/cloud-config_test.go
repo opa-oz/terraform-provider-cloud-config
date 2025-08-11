@@ -49,7 +49,8 @@ func TestAccExampleResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"cloud-config.test",
 						tfjsonpath.New("content"),
-						knownvalue.StringExact(strings.TrimSpace(`#cloud-config
+						knownvalue.StringExact(strings.TrimSpace(`
+#cloud-config
 hostname: two
 fqdn: two.lan
 prefer_fqdn_over_hostname: true
@@ -58,6 +59,9 @@ create_hostname_file: false
 locale: en_two
 locale_configfile: /etc/locale
 timezone: Asia/two
+runcmd:
+    - echo '11'
+    - cat two
               `)),
 					),
 				},
@@ -79,6 +83,8 @@ resource "cloud-config" "test" {
   locale_configfile = "/etc/locale"
 
   timezone = "Asia/%[1]s"
+
+	runcmd = ["echo '11'", "cat %[1]s"]
 }
 `, configurableAttribute)
 }

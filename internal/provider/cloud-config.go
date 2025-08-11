@@ -28,12 +28,14 @@ type CloudConfigResourceModel struct {
 	ccmodules.SetHostnameModel
 	ccmodules.LocaleModel
 	ccmodules.TimezoneModel
+	ccmodules.RunCMDModule
 }
 
 type ExportModel struct {
 	ccmodules.SetHostnameOutputModel `yaml:",inline"`
 	ccmodules.LocaleOutputModel      `yaml:",inline"`
 	ccmodules.TimezoneOutputModel    `yaml:",inline"`
+	ccmodules.RunCMDOutputModule     `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,6 +59,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.SetHostname(),
 		ccmodules.Locale(),
 		ccmodules.Timezone(),
+		ccmodules.RunCMD(),
 	}
 
 	for _, module := range flat_modules {
@@ -85,9 +88,9 @@ func (r *CloudConfigResource) Create(ctx context.Context, req resource.CreateReq
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "created a resource")
 
-	content, err := ExportContent(data)
+	content, err := ExportContent(ctx, data)
 	if err != nil {
-		tflog.Error(ctx, err.Error())
+		resp.Diagnostics.Append(err...)
 		return
 	}
 
@@ -119,9 +122,9 @@ func (r *CloudConfigResource) Update(ctx context.Context, req resource.UpdateReq
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	content, err := ExportContent(data)
+	content, err := ExportContent(ctx, data)
 	if err != nil {
-		tflog.Error(ctx, err.Error())
+		resp.Diagnostics.Append(err...)
 		return
 	}
 
@@ -139,6 +142,15 @@ func (r *CloudConfigResource) Delete(ctx context.Context, req resource.DeleteReq
 
 	if resp.Diagnostics.HasError() {
 		return
+	}
+}
+
+func (r *CloudConfigResource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
+	return []resource.ConfigValidator{
+		// resourcevalidator.Conflicting(
+		// 	path.MatchRoot("runcmd"),
+		// 	path.MatchRoot("runcmds"),
+		// ),
 	}
 }
 
