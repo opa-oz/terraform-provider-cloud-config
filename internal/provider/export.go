@@ -4,17 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	ccmodules "github.com/opa-oz/terraform-provider-cloud-config/internal/cc-modules"
 	"gopkg.in/yaml.v3"
 )
 
 const (
 	hat = "#cloud-config"
 )
-
-type ExportModel struct {
-	ccmodules.SetHostnameOutputModel `yaml:",inline"`
-}
 
 func transform(model CloudConfigResourceModel) ExportModel {
 	output := ExportModel{}
@@ -28,6 +23,9 @@ func transform(model CloudConfigResourceModel) ExportModel {
 	if !model.CreateHostnameFile.IsNull() && !model.CreateHostnameFile.ValueBool() {
 		output.CreateHostnameFile = model.CreateHostnameFile.ValueBoolPointer()
 	}
+
+	output.Locale = model.Locale.ValueString()
+	output.LocaleConfigfile = model.LocaleConfigfile.ValueString()
 
 	return output
 }

@@ -55,6 +55,8 @@ fqdn: two.lan
 prefer_fqdn_over_hostname: true
 preserve_hostname: true
 create_hostname_file: false
+locale: en_two
+locale_configfile: /etc/locale
               `)),
 					),
 				},
@@ -71,6 +73,9 @@ resource "cloud-config" "test" {
   prefer_fqdn_over_hostname = true
   preserve_hostname = true
   create_hostname_file = false
+
+  locale = "en_%[1]s"
+  locale_configfile = "/etc/locale"
 }
 `, configurableAttribute)
 }

@@ -26,6 +26,12 @@ type CloudConfigResourceModel struct {
 	Content types.String `tfsdk:"content"`
 
 	ccmodules.SetHostnameModel
+	ccmodules.LocaleModel
+}
+
+type ExportModel struct {
+	ccmodules.SetHostnameOutputModel `yaml:",inline"`
+	ccmodules.LocaleOutputModel      `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -47,6 +53,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 
 	flat_modules := []ccmodules.CCModuleFlat{
 		ccmodules.SetHostname(),
+		ccmodules.Locale(),
 	}
 
 	for _, module := range flat_modules {
