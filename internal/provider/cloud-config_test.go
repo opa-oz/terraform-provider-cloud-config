@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -48,10 +49,13 @@ func TestAccExampleResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"cloud-config.test",
 						tfjsonpath.New("content"),
-						knownvalue.StringExact(`#cloud-config
+						knownvalue.StringExact(strings.TrimSpace(`#cloud-config
 hostname: two
 fqdn: two.lan
-              `),
+prefer_fqdn_over_hostname: true
+preserve_hostname: true
+create_hostname_file: false
+              `)),
 					),
 				},
 			},
@@ -64,6 +68,9 @@ func testAccExampleResourceConfig(configurableAttribute string) string {
 resource "cloud-config" "test" {
   hostname = %[1]q
   fqdn = "%[1]s.lan"
+  prefer_fqdn_over_hostname = true
+  preserve_hostname = true
+  create_hostname_file = false
 }
 `, configurableAttribute)
 }

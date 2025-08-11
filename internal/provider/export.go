@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"strings"
 
 	ccmodules "github.com/opa-oz/terraform-provider-cloud-config/internal/cc-modules"
 	"gopkg.in/yaml.v3"
@@ -24,8 +25,8 @@ func transform(model CloudConfigResourceModel) ExportModel {
 	output.PreferFQDNOverHostname = model.PreferFQDNOverHostname.ValueBool()
 
 	// NOTE: default value is anyway `true`
-	if !model.CreateHostnameFile.ValueBool() {
-		output.CreateHostnameFile = model.CreateHostnameFile.ValueBool()
+	if !model.CreateHostnameFile.IsNull() && !model.CreateHostnameFile.ValueBool() {
+		output.CreateHostnameFile = model.CreateHostnameFile.ValueBoolPointer()
 	}
 
 	return output
@@ -38,7 +39,7 @@ func ExportContent(model CloudConfigResourceModel) (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf(`%s
+	return strings.TrimSpace(fmt.Sprintf(`%s
 %s
-  `, hat, yaml), nil
+  `, hat, yaml)), nil
 }
