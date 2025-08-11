@@ -27,11 +27,13 @@ type CloudConfigResourceModel struct {
 
 	ccmodules.SetHostnameModel
 	ccmodules.LocaleModel
+	ccmodules.TimezoneModel
 }
 
 type ExportModel struct {
 	ccmodules.SetHostnameOutputModel `yaml:",inline"`
 	ccmodules.LocaleOutputModel      `yaml:",inline"`
+	ccmodules.TimezoneOutputModel    `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -54,6 +56,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 	flat_modules := []ccmodules.CCModuleFlat{
 		ccmodules.SetHostname(),
 		ccmodules.Locale(),
+		ccmodules.Timezone(),
 	}
 
 	for _, module := range flat_modules {

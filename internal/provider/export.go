@@ -27,6 +27,8 @@ func transform(model CloudConfigResourceModel) ExportModel {
 	output.Locale = model.Locale.ValueString()
 	output.LocaleConfigfile = model.LocaleConfigfile.ValueString()
 
+	output.Timezone = model.Timezone.ValueString()
+
 	return output
 }
 

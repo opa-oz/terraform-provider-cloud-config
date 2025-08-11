@@ -57,6 +57,7 @@ preserve_hostname: true
 create_hostname_file: false
 locale: en_two
 locale_configfile: /etc/locale
+timezone: Asia/two
               `)),
 					),
 				},
@@ -76,6 +77,8 @@ resource "cloud-config" "test" {
 
   locale = "en_%[1]s"
   locale_configfile = "/etc/locale"
+
+  timezone = "Asia/%[1]s"
 }
 `, configurableAttribute)
 }
