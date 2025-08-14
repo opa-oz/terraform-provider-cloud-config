@@ -32,6 +32,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.TimezoneModel
 	ccmodules.RunCMDModule
 	ccmodules.UpdateEtcHostsModule
+	ccmodules.SSHModel
 }
 
 type ExportModel struct {
@@ -40,6 +41,7 @@ type ExportModel struct {
 	ccmodules.TimezoneOutputModel        `yaml:",inline"`
 	ccmodules.RunCMDOutputModule         `yaml:",inline"`
 	ccmodules.UpdateEtcHostsOutputModule `yaml:",inline"`
+	ccmodules.SSHOutputModel             `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -65,6 +67,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.Timezone(),
 		ccmodules.RunCMD(),
 		ccmodules.UpdateEtcHosts(),
+		ccmodules.SSH(),
 	}
 
 	for _, module := range flat_modules {

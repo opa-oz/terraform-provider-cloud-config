@@ -63,6 +63,8 @@ runcmd:
     - echo '11'
     - cat two
 manage_etc_hosts: localhost
+ssh_authorized_keys:
+    - two
               `)),
 					),
 				},
@@ -88,6 +90,8 @@ resource "cloud-config" "test" {
 	runcmd = ["echo '11'", "cat %[1]s"]
 
 	manage_etc_hosts_localhost = true
+
+	ssh_authorized_keys = [%[1]q]
 }
 `, configurableAttribute)
 }

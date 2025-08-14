@@ -52,6 +52,20 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 		output.ManageEtcHosts = model.ManageEtcHosts.ValueBool()
 	}
 
+	if !model.SSHAuthorizedKeys.IsUnknown() {
+		elems := model.SSHAuthorizedKeys.Elements()
+
+		if len(elems) > 0 {
+			sshAuthKeys := make([]string, len(elems))
+			diagnostics := model.SSHAuthorizedKeys.ElementsAs(ctx, &sshAuthKeys, false)
+
+			if diagnostics.HasError() {
+				return output, diagnostics
+			}
+			output.SSHAuthorizedKeys = sshAuthKeys
+		}
+	}
+
 	return output, nil
 }
 
