@@ -5,37 +5,37 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type ChPasswdUser struct {
+type ChangePasswordUser struct {
 	Name     types.String `tfsdk:"name"`
 	Password types.String `tfsdk:"password"`
 	Type     types.String `tfsdk:"type"`
 }
 
-type ChPasswdUserOutput struct {
+type ChangePasswordUserOutput struct {
 	Name     string `yaml:"name,omitempty"`
 	Password string `yaml:"password,omitempty"`
 	Type     string `yaml:"type,omitempty"`
 }
 
-type ChPasswd struct {
-	Users  *[]ChPasswdUser `tfsdk:"users"`
-	Expire types.Bool      `tfsdk:"expire"`
+type ChangePassword struct {
+	Users  *[]ChangePasswordUser `tfsdk:"users"`
+	Expire types.Bool            `tfsdk:"expire"`
 }
 
-type ChPasswdOutput struct {
-	Users  *[]ChPasswdUserOutput `yaml:"users,omitempty"`
-	Expire *bool                 `yaml:"expire,omitempty"`
+type ChangePasswordOutput struct {
+	Users  *[]ChangePasswordUserOutput `yaml:"users,omitempty"`
+	Expire *bool                       `yaml:"expire,omitempty"`
 }
 
 type SetPasswordsModel struct {
 	SSHPwauth types.Bool `tfsdk:"ssh_pwauth"`
 
-	ChPasswd *ChPasswd `tfsdk:"chpasswd"`
+	ChPasswd *ChangePassword `tfsdk:"chpasswd"`
 }
 
 type SetPasswordsOutputModel struct {
-	SSHPwauth *bool           `yaml:"ssh_pwauth,omitempty"` // NOTE: `false` needs to be set explicitly
-	ChPasswd  *ChPasswdOutput `yaml:"chpasswd,omitempty"`
+	SSHPwauth *bool                 `yaml:"ssh_pwauth,omitempty"` // NOTE: `false` needs to be set explicitly
+	ChPasswd  *ChangePasswordOutput `yaml:"chpasswd,omitempty"`
 }
 
 // SetPasswords

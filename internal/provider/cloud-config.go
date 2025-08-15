@@ -34,16 +34,18 @@ type CloudConfigResourceModel struct {
 	ccmodules.UpdateEtcHostsModule
 	ccmodules.SSHModel
 	ccmodules.SetPasswordsModel
+	ccmodules.PkgUpdateUpgradeModel
 }
 
 type ExportModel struct {
-	ccmodules.SetHostnameOutputModel     `yaml:",inline"`
-	ccmodules.LocaleOutputModel          `yaml:",inline"`
-	ccmodules.TimezoneOutputModel        `yaml:",inline"`
-	ccmodules.RunCMDOutputModule         `yaml:",inline"`
-	ccmodules.UpdateEtcHostsOutputModule `yaml:",inline"`
-	ccmodules.SSHOutputModel             `yaml:",inline"`
-	ccmodules.SetPasswordsOutputModel    `yaml:",inline"`
+	ccmodules.SetHostnameOutputModel      `yaml:",inline"`
+	ccmodules.LocaleOutputModel           `yaml:",inline"`
+	ccmodules.TimezoneOutputModel         `yaml:",inline"`
+	ccmodules.RunCMDOutputModule          `yaml:",inline"`
+	ccmodules.UpdateEtcHostsOutputModule  `yaml:",inline"`
+	ccmodules.SSHOutputModel              `yaml:",inline"`
+	ccmodules.SetPasswordsOutputModel     `yaml:",inline"`
+	ccmodules.PkgUpdateUpgradeOutputModel `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -71,8 +73,8 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.RunCMD(),
 		ccmodules.UpdateEtcHosts(),
 		ccmodules.SSH(),
-
 		ccmodules.SetPasswords(),
+		ccmodules.PkgUpdateUpgrade(),
 	}
 
 	for _, module := range flat_modules {

@@ -468,3 +468,36 @@ chpasswd:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestPkgUpdateUpgradeModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic Auth keys",
+			input: `
+      package_update = true
+      package_upgrade = true
+      package_reboot_if_required = false
+      packages = [
+        "qemu-guest-agent",
+      "ufw"
+      ]
+			`,
+			expectedValues: map[string]string{
+				"package_update":             "true",
+				"package_upgrade":            "true",
+				"packages.0":                 "qemu-guest-agent",
+				"packages.1":                 "ufw",
+				"package_reboot_if_required": "false",
+			},
+			expectedOutput: `
+package_update: true
+package_upgrade: true
+packages:
+    - qemu-guest-agent
+    - ufw
+      `,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}

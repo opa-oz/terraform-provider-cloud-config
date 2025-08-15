@@ -76,7 +76,7 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	if model.ChPasswd != nil {
-		output.ChPasswd = &ccmodules.ChPasswdOutput{}
+		output.ChPasswd = &ccmodules.ChangePasswordOutput{}
 
 		md := model.ChPasswd
 
@@ -85,9 +85,9 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 		}
 
 		if md.Users != nil {
-			usrs := make([]ccmodules.ChPasswdUserOutput, len(*md.Users))
+			usrs := make([]ccmodules.ChangePasswordUserOutput, len(*md.Users))
 			for i, usr := range *md.Users {
-				newUsr := ccmodules.ChPasswdUserOutput{}
+				newUsr := ccmodules.ChangePasswordUserOutput{}
 
 				if !usr.Name.IsNull() {
 					newUsr.Name = usr.Name.ValueString()
@@ -103,6 +103,24 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 			}
 
 			output.ChPasswd.Users = &usrs
+		}
+	}
+
+	output.PackageUpdate = model.PackageUpdate.ValueBool()
+	output.PackageUpgrade = model.PackageUpgrade.ValueBool()
+	output.PackageRebootIfRequired = model.PackageRebootIfRequired.ValueBool()
+
+	if !model.Packages.IsUnknown() {
+		elems := model.Packages.Elements()
+
+		if len(elems) > 0 {
+			cmds := make([]string, len(elems))
+			diagnostics := model.Packages.ElementsAs(ctx, &cmds, false)
+
+			if diagnostics.HasError() {
+				return output, diagnostics
+			}
+			output.Packages = cmds
 		}
 	}
 
