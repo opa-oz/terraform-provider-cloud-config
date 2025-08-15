@@ -33,6 +33,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.RunCMDModule
 	ccmodules.UpdateEtcHostsModule
 	ccmodules.SSHModel
+	ccmodules.SetPasswordsModel
 }
 
 type ExportModel struct {
@@ -42,6 +43,7 @@ type ExportModel struct {
 	ccmodules.RunCMDOutputModule         `yaml:",inline"`
 	ccmodules.UpdateEtcHostsOutputModule `yaml:",inline"`
 	ccmodules.SSHOutputModel             `yaml:",inline"`
+	ccmodules.SetPasswordsOutputModel    `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,6 +61,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 				MarkdownDescription: "YAML content of cloud-init file",
 			},
 		},
+		Blocks: map[string]schema.Block{},
 	}
 
 	flat_modules := []ccmodules.CCModuleFlat{
@@ -68,11 +71,22 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.RunCMD(),
 		ccmodules.UpdateEtcHosts(),
 		ccmodules.SSH(),
+
+		ccmodules.SetPasswords(),
 	}
 
 	for _, module := range flat_modules {
 		maps.Insert(schema.Attributes, maps.All(module.Attributes()))
 	}
+
+	block_modules := []ccmodules.CCModuleNested{
+		ccmodules.SetPasswordsBlock(),
+	}
+
+	for _, module := range block_modules {
+		maps.Insert(schema.Blocks, maps.All(module.Block()))
+	}
+
 	resp.Schema = schema
 }
 func (r *CloudConfigResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

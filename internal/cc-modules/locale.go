@@ -11,8 +11,8 @@ type LocaleModel struct {
 }
 
 type LocaleOutputModel struct {
-	Locale           string `yaml:"locale"`
-	LocaleConfigfile string `yaml:"locale_configfile"`
+	Locale           string `yaml:"locale,omitempty"`
+	LocaleConfigfile string `yaml:"locale_configfile,omitempty"`
 }
 
 // Locale

@@ -11,7 +11,7 @@ type UpdateEtcHostsModule struct {
 }
 
 type UpdateEtcHostsOutputModule struct {
-	ManageEtcHosts any `yaml:"manage_etc_hosts"`
+	ManageEtcHosts any `yaml:"manage_etc_hosts,omitempty"`
 }
 
 // UpdateEtcHosts

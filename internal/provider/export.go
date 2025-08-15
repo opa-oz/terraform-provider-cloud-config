@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	ccmodules "github.com/opa-oz/terraform-provider-cloud-config/internal/cc-modules"
 
 	"gopkg.in/yaml.v3"
 )
@@ -27,8 +28,12 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 		output.CreateHostnameFile = model.CreateHostnameFile.ValueBoolPointer()
 	}
 
-	output.Locale = model.Locale.ValueString()
-	output.LocaleConfigfile = model.LocaleConfigfile.ValueString()
+	if !model.Locale.IsUnknown() {
+		output.Locale = model.Locale.ValueString()
+	}
+	if !model.LocaleConfigfile.IsUnknown() {
+		output.LocaleConfigfile = model.LocaleConfigfile.ValueString()
+	}
 
 	output.Timezone = model.Timezone.ValueString()
 
@@ -46,9 +51,9 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 		}
 	}
 
-	if model.ManageEtcHostsLocalhost.ValueBool() {
+	if !model.ManageEtcHostsLocalhost.IsNull() && model.ManageEtcHostsLocalhost.ValueBool() {
 		output.ManageEtcHosts = "localhost"
-	} else {
+	} else if !model.ManageEtcHosts.IsNull() {
 		output.ManageEtcHosts = model.ManageEtcHosts.ValueBool()
 	}
 
@@ -63,6 +68,41 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 				return output, diagnostics
 			}
 			output.SSHAuthorizedKeys = sshAuthKeys
+		}
+	}
+
+	if !model.SSHPwauth.IsNull() {
+		output.SSHPwauth = model.SSHPwauth.ValueBoolPointer()
+	}
+
+	if model.ChPasswd != nil {
+		output.ChPasswd = &ccmodules.ChPasswdOutput{}
+
+		md := model.ChPasswd
+
+		if !md.Expire.IsNull() {
+			output.ChPasswd.Expire = md.Expire.ValueBoolPointer()
+		}
+
+		if md.Users != nil {
+			usrs := make([]ccmodules.ChPasswdUserOutput, len(*md.Users))
+			for i, usr := range *md.Users {
+				newUsr := ccmodules.ChPasswdUserOutput{}
+
+				if !usr.Name.IsNull() {
+					newUsr.Name = usr.Name.ValueString()
+				}
+				if !usr.Password.IsNull() {
+					newUsr.Password = usr.Password.ValueString()
+				}
+				if !usr.Type.IsNull() {
+					newUsr.Type = usr.Type.ValueString()
+				}
+
+				usrs[i] = newUsr
+			}
+
+			output.ChPasswd.Users = &usrs
 		}
 	}
 

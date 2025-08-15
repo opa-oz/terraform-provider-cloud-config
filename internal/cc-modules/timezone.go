@@ -10,7 +10,7 @@ type TimezoneModel struct {
 }
 
 type TimezoneOutputModel struct {
-	Timezone string `yaml:"timezone"`
+	Timezone string `yaml:"timezone,omitempty"`
 }
 
 // Timezone

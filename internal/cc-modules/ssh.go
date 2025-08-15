@@ -10,7 +10,7 @@ type SSHModel struct {
 }
 
 type SSHOutputModel struct {
-	SSHAuthorizedKeys []string `yaml:"ssh_authorized_keys"`
+	SSHAuthorizedKeys []string `yaml:"ssh_authorized_keys,omitempty"`
 }
 
 // SSH
