@@ -35,6 +35,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.SSHModel
 	ccmodules.SetPasswordsModel
 	ccmodules.PkgUpdateUpgradeModel
+	ccmodules.UsersAndGroupsModel
 }
 
 type ExportModel struct {
@@ -46,6 +47,7 @@ type ExportModel struct {
 	ccmodules.SSHOutputModel              `yaml:",inline"`
 	ccmodules.SetPasswordsOutputModel     `yaml:",inline"`
 	ccmodules.PkgUpdateUpgradeOutputModel `yaml:",inline"`
+	ccmodules.UsersAndGroupsOutputModel   `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -75,6 +77,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.SSH(),
 		ccmodules.SetPasswords(),
 		ccmodules.PkgUpdateUpgrade(),
+		ccmodules.UsersAndGroups(),
 	}
 
 	for _, module := range flat_modules {
@@ -83,6 +86,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 
 	block_modules := []ccmodules.CCModuleNested{
 		ccmodules.SetPasswordsBlock(),
+		ccmodules.UsersAndGroupsBlock(),
 	}
 
 	for _, module := range block_modules {

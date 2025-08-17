@@ -2,6 +2,8 @@ package provider
 
 import (
 	"fmt"
+	"math/big"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -165,11 +167,20 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 					knownvalue.Bool(false),
 				))
 			default:
-				checks = append(checks, statecheck.ExpectKnownValue(
-					resourceName,
-					path,
-					knownvalue.StringExact(val),
-				))
+				if utils.IsNumeric(val) {
+					nVal, _ := strconv.ParseFloat(val, 64)
+					checks = append(checks, statecheck.ExpectKnownValue(
+						resourceName,
+						path,
+						knownvalue.NumberExact(big.NewFloat(nVal)),
+					))
+				} else {
+					checks = append(checks, statecheck.ExpectKnownValue(
+						resourceName,
+						path,
+						knownvalue.StringExact(val),
+					))
+				}
 			}
 		}
 
@@ -405,7 +416,7 @@ chpasswd {
 
       users {
         name = "docker"
-        password = "12345678"
+        password = "p12345678"
         type = "text"
       }
 }
@@ -414,7 +425,7 @@ chpasswd {
 				"chpasswd.users.0.name":     "ansible",
 				"chpasswd.users.0.type":     "RANDOM",
 				"chpasswd.users.1.name":     "docker",
-				"chpasswd.users.1.password": "12345678",
+				"chpasswd.users.1.password": "p12345678",
 				"chpasswd.users.1.type":     "text",
 			},
 			expectedOutput: `
@@ -423,7 +434,7 @@ chpasswd:
         - name: ansible
           type: RANDOM
         - name: docker
-          password: "12345678"
+          password: p12345678
           type: text
     expire: false
       `,
@@ -495,6 +506,291 @@ package_upgrade: true
 packages:
     - qemu-guest-agent
     - ufw
+      `,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
+func TestUsersAndGroupsModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "User configuration",
+			input: `
+user {
+  name = "myname"
+  doas = ["do this", "do that"]
+  expiredate = "Jan 2025"
+  gecos = "This use is jsut for testing"
+  homedir = "/home/myname"
+  inactive = "90 days" # deactivate in 90 days
+  lock_passwd = false
+  no_create_home = false
+  no_log_init = true
+  no_user_group = true
+  passwd = "mypwd"
+  hashed_passwd = "hashed pwd"
+  plain_text_passwd = "mypwd"
+  create_groups = true
+  primary_group = "default"
+  selinux_user = "myname"
+  shell = "/bin/bash"
+  snapuser = "myname"
+  ssh_authorized_keys = ["mykey"]
+  ssh_import_id = ["import key"]
+  system = true
+  sudo = ["idk what is expected here, documentation is silent"]
+  uid = 1001
+}
+			`,
+			expectedValues: map[string]string{
+				"user.name":                  "myname",
+				"user.doas.0":                "do this",
+				"user.doas.1":                "do that",
+				"user.expiredate":            "Jan 2025",
+				"user.gecos":                 "This use is jsut for testing",
+				"user.homedir":               "/home/myname",
+				"user.inactive":              "90 days",
+				"user.lock_passwd":           "false",
+				"user.no_create_home":        "false",
+				"user.no_log_init":           "true",
+				"user.no_user_group":         "true",
+				"user.passwd":                "mypwd",
+				"user.hashed_passwd":         "hashed pwd",
+				"user.plain_text_passwd":     "mypwd",
+				"user.create_groups":         "true",
+				"user.primary_group":         "default",
+				"user.selinux_user":          "myname",
+				"user.shell":                 "/bin/bash",
+				"user.snapuser":              "myname",
+				"user.ssh_authorized_keys.0": "mykey",
+				"user.ssh_import_id.0":       "import key",
+				"user.system":                "true",
+				"user.sudo.0":                "idk what is expected here, documentation is silent",
+				"user.uid":                   "1001",
+			},
+			expectedOutput: `
+user:
+    name: myname
+    doas:
+        - do this
+        - do that
+    expiredate: Jan 2025
+    gecos: This use is jsut for testing
+    homedir: /home/myname
+    inactive: 90 days
+    lock_passwd: false
+    no_log_init: true
+    no_user_group: true
+    passwd: mypwd
+    hashed_passwd: hashed pwd
+    plain_text_passwd: mypwd
+    create_groups: true
+    primary_group: default
+    selinux_user: myname
+    shell: /bin/bash
+    snapuser: myname
+    ssh_authorized_keys:
+        - mykey
+    ssh_import_id:
+        - import key
+    system: true
+    uid: 1001
+    sudo:
+        - idk what is expected here, documentation is silent
+      `,
+		},
+		{
+			name: "UserS configuration",
+			input: `
+users {
+  name = "myname"
+  doas = ["do this", "do that"]
+  expiredate = "Jan 2025"
+  gecos = "This use is jsut for testing"
+  homedir = "/home/myname"
+  inactive = "90 days" # deactivate in 90 days
+  lock_passwd = false
+  no_create_home = false
+  no_log_init = true
+  no_user_group = true
+  passwd = "mypwd"
+  hashed_passwd = "hashed pwd"
+  plain_text_passwd = "mypwd"
+  create_groups = true
+  primary_group = "default"
+  selinux_user = "myname"
+  shell = "/bin/bash"
+  snapuser = "myname"
+  ssh_authorized_keys = ["mykey"]
+  ssh_import_id = ["import key"]
+  system = true
+  sudo = ["idk what is expected here, documentation is silent"]
+  uid = 1001
+}
+users {
+  name = "myname2"
+  doas = ["do this", "do that"]
+  expiredate = "Jan 2025"
+  gecos = "This use is jsut for testing"
+  homedir = "/home/myname"
+  inactive = "90 days" # deactivate in 90 days
+  lock_passwd = true
+  no_create_home = true
+  no_log_init = false
+  no_user_group = false
+  passwd = "mypwd"
+  hashed_passwd = "hashed pwd"
+  plain_text_passwd = "mypwd"
+  create_groups = true
+  primary_group = "default"
+  selinux_user = "myname"
+  shell = "/bin/bash"
+  snapuser = "myname"
+  ssh_redirect_user = true
+  system = true
+  sudo = ["idk what is expected here, documentation is silent"]
+  uid = 1001
+}
+			`,
+			expectedValues: map[string]string{
+				"users.0.name":                  "myname",
+				"users.0.doas.0":                "do this",
+				"users.0.doas.1":                "do that",
+				"users.0.expiredate":            "Jan 2025",
+				"users.0.gecos":                 "This use is jsut for testing",
+				"users.0.homedir":               "/home/myname",
+				"users.0.inactive":              "90 days",
+				"users.0.lock_passwd":           "false",
+				"users.0.no_create_home":        "false",
+				"users.0.no_log_init":           "true",
+				"users.0.no_user_group":         "true",
+				"users.0.passwd":                "mypwd",
+				"users.0.hashed_passwd":         "hashed pwd",
+				"users.0.plain_text_passwd":     "mypwd",
+				"users.0.create_groups":         "true",
+				"users.0.primary_group":         "default",
+				"users.0.selinux_user":          "myname",
+				"users.0.shell":                 "/bin/bash",
+				"users.0.snapuser":              "myname",
+				"users.0.ssh_authorized_keys.0": "mykey",
+				"users.0.ssh_import_id.0":       "import key",
+				"users.0.system":                "true",
+				"users.0.sudo.0":                "idk what is expected here, documentation is silent",
+				"users.0.uid":                   "1001",
+
+				"users.1.name":              "myname2",
+				"users.1.doas.0":            "do this",
+				"users.1.doas.1":            "do that",
+				"users.1.expiredate":        "Jan 2025",
+				"users.1.gecos":             "This use is jsut for testing",
+				"users.1.homedir":           "/home/myname",
+				"users.1.inactive":          "90 days",
+				"users.1.lock_passwd":       "true",
+				"users.1.no_create_home":    "true",
+				"users.1.no_log_init":       "false",
+				"users.1.no_user_group":     "false",
+				"users.1.passwd":            "mypwd",
+				"users.1.hashed_passwd":     "hashed pwd",
+				"users.1.plain_text_passwd": "mypwd",
+				"users.1.create_groups":     "true",
+				"users.1.primary_group":     "default",
+				"users.1.selinux_user":      "myname",
+				"users.1.shell":             "/bin/bash",
+				"users.1.snapuser":          "myname",
+				"users.1.ssh_redirect_user": "true",
+				"users.1.system":            "true",
+				"users.1.sudo.0":            "idk what is expected here, documentation is silent",
+				"users.1.uid":               "1001",
+			},
+			expectedOutput: `
+users:
+    - name: myname
+      doas:
+        - do this
+        - do that
+      expiredate: Jan 2025
+      gecos: This use is jsut for testing
+      homedir: /home/myname
+      inactive: 90 days
+      lock_passwd: false
+      no_log_init: true
+      no_user_group: true
+      passwd: mypwd
+      hashed_passwd: hashed pwd
+      plain_text_passwd: mypwd
+      create_groups: true
+      primary_group: default
+      selinux_user: myname
+      shell: /bin/bash
+      snapuser: myname
+      ssh_authorized_keys:
+        - mykey
+      ssh_import_id:
+        - import key
+      system: true
+      uid: 1001
+      sudo:
+        - idk what is expected here, documentation is silent
+    - name: myname2
+      doas:
+        - do this
+        - do that
+      expiredate: Jan 2025
+      gecos: This use is jsut for testing
+      homedir: /home/myname
+      inactive: 90 days
+      no_create_home: true
+      passwd: mypwd
+      hashed_passwd: hashed pwd
+      plain_text_passwd: mypwd
+      create_groups: true
+      primary_group: default
+      selinux_user: myname
+      shell: /bin/bash
+      snapuser: myname
+      ssh_redirect_user: true
+      system: true
+      uid: 1001
+      sudo:
+        - idk what is expected here, documentation is silent
+
+      `,
+		},
+		{
+			name: "Almost empty",
+			input: `
+user {
+      name = "ansible"
+}
+
+users {
+  name = "docker"
+}
+			`,
+			expectedValues: map[string]string{
+				"user.name":    "ansible",
+				"users.0.name": "docker",
+			},
+			expectedOutput: `
+user:
+    name: ansible
+users:
+    - name: docker
+      `,
+		},
+		{
+			name: "Groups",
+			input: `
+      groups = ["docker"]
+			`,
+			expectedValues: map[string]string{
+				"groups.0": "docker",
+			},
+			expectedOutput: `
+groups:
+    - docker
       `,
 		},
 	}
