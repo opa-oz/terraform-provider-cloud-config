@@ -200,3 +200,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Write Files        | TBD            |                       |
 | Yum Add Repo       | TBD            |                       |
 | Zypper Add Repo    | TBD            |                       |
+
+----
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S1UZ9P7)
