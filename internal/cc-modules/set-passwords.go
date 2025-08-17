@@ -1,8 +1,11 @@
 package ccmodules
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/opa-oz/terraform-provider-cloud-config/internal/utils"
 )
 
 type ChangePasswordUser struct {
@@ -61,6 +64,9 @@ func SetPasswordsBlock() CCModuleNested {
 	return CCModuleNested{
 		block: map[string]schema.Block{
 			"chpasswd": schema.SingleNestedBlock{
+				PlanModifiers: []planmodifier.Object{
+					utils.NullWhen(path.Root("chpasswd")),
+				},
 				MarkdownDescription: `
 The chpasswd config key accepts a dictionary containing either (or both) of users and expire.
 

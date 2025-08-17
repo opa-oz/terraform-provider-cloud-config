@@ -1,5 +1,10 @@
 # terraform-provider-cloud-config
 
+[![Tests](https://github.com/opa-oz/terraform-provider-cloud-config/actions/workflows/test.yaml/badge.svg)](https://github.com/opa-oz/terraform-provider-cloud-config/actions/workflows/test.yaml)
+[![Release](https://img.shields.io/github/v/release/opa-oz/terraform-provider-cloud-config?style=flat-square)](https://github.com/opa-oz/terraform-provider-cloud-config/releases)
+[![Terraform registry](https://img.shields.io/badge/terraform-registry-623CE4.svg?style=flat-square&logo=terraform)](https://registry.terraform.io/providers/opa-oz/cloud-config)
+[![OpenTofu Registry](https://img.shields.io/badge/opentofu-registry-yellow.svg)](https://search.opentofu.org/provider/opa-oz/cloud-config)
+
 Better than `yamlencode` (IMO)
 
 ## Motivation

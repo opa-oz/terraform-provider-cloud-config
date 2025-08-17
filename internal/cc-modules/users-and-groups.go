@@ -4,8 +4,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/boolvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/opa-oz/terraform-provider-cloud-config/internal/utils"
 )
 
 type User struct {
@@ -211,6 +213,9 @@ func UsersAndGroupsBlock() CCModuleNested {
 			"user": schema.SingleNestedBlock{
 				MarkdownDescription: "The user dictionary values override the `default_user` configuration from `/etc/cloud/cloud.cfg`. The user dictionary keys supported for the `default_user` are the same as the users schema.",
 				Attributes:          userAttributes,
+				PlanModifiers: []planmodifier.Object{
+					utils.NullWhen(path.Root("user")),
+				},
 			},
 			"users": schema.ListNestedBlock{
 				MarkdownDescription: "List of users",

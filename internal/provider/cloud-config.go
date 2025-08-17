@@ -98,6 +98,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 
 	resp.Schema = schema
 }
+
 func (r *CloudConfigResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {

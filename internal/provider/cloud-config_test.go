@@ -475,6 +475,19 @@ chpasswd:
     expire: false
       `,
 		},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
 	}
 
 	resource.Test(t, assembleTestCase(testCases, t))
