@@ -155,12 +155,12 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Keyboard           | TBD            |                       |
 | Keys to Console    | TBD            |                       |
 | Landscape          | TBD            |                       |
-| Locale             | Full            |                       |
+| Locale             | **Full**            |                       |
 | LXD                | TBD            |                       |
 | MCollective        | TBD            |                       |
 | Mounts             | TBD            |                       |
 | NTP                | TBD            |                       |
-| Package Update Upgrade Install| Partial            |    Attributes `apt` and `snap` aren't supported                  |
+| Package Update Upgrade Install| _Partial_            |    Attributes `apt` and `snap` aren't supported                  |
 | Phone Home          | TBD            |                       | 
 | Power State Change  | TBD            |                       |
 | Puppet             | TBD            |                       |
@@ -169,7 +169,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Resolv Conf        | TBD            |                       |
 | Red Hat Subscription| TBD            |                       |
 | Rsyslog            | TBD            |                       |
-| Runcmd             | Partial            |     For now only "array of strings" supported, "array of array of strings" TBD                |
+| Runcmd             | _Partial_            |     For now only "array of strings" supported, "array of array of strings" TBD                |
 | Salt Minion        | TBD            |                       |
 | Scripts Per Boot   | TBD            |                       |
 | Scripts Per Instance| TBD            |                       |
@@ -177,20 +177,20 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Scripts User       | TBD            |                       |
 | Scripts Vendor     | TBD            |                       |
 | Seed Random        | TBD            |                       |
-| Set Hostname        | Full            |                       |
-| Set Passwords      | Partial            |    Mostly supported, lacking validation                   |
+| Set Hostname        | **Full**            |                       |
+| Set Passwords      | _Partial_            |    Mostly supported, lacking validation                   |
 | Snap               | TBD            |                       |
 | Spacewalk          | TBD            |                       |
-| SSH                | Partial            |         Only `ssh_authorized_keys` is supported              |
+| SSH                | _Partial_            |         Only `ssh_authorized_keys` is supported              |
 | SSH AuthKey Fingerprints | TBD            |                       |
 | SSH Import ID      | TBD            |                       |
-| Timezone           | Full            |           No brainer            |
+| Timezone           | **Full**            |           No brainer            |
 | Ubuntu Drivers     | TBD            |                       |
 | Ubuntu Autoinstall | TBD            |                       |
 | Ubuntu Pro         | TBD            |                       |
-| Update Etc Hosts  | Full            |      Supported as two fields, because in original it's `true/false/'localhost'`                 |
+| Update Etc Hosts  | **Full**            |      Supported as two fields, because in original it's `true/false/'localhost'`                 |
 | Update Hostname    | TBD            |                       |
-| Users and Groups   | Partial            |     No support for deprecated fields, no support for nested `groups` object                  |
+| Users and Groups   | _Partial_            |     No support for deprecated fields, no support for nested `groups` object                  |
 | Wireguard          | TBD            |                       |
 | Write Files        | TBD            |                       |
 | Yum Add Repo       | TBD            |                       |

@@ -40,7 +40,7 @@ func PkgUpdateUpgrade() CCModuleFlat {
 			},
 			"packages": schema.ListAttribute{ // TODO: Proper type (array of object/array of string/string)
 				ElementType:         types.StringType,
-				MarkdownDescription: "An array containing a package specification",
+				MarkdownDescription: "[WIP] An array containing a package specification",
 				Optional:            true,
 			},
 		},

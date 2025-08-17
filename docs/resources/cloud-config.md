@@ -23,6 +23,7 @@ Cloud-config file in-memory representation
  - The expire key is used to set whether to expire all user passwords specified by this module, such that a password will need to be reset on the user’s next login. (see [below for nested schema](#nestedblock--chpasswd))
 - `create_hostname_file` (Boolean) If `false`, the hostname file (e.g. `/etc/hostname`) will not be created if it does not exist. On systems that use systemd, setting `create_hostname_file` to `false` will set the hostname transiently. If true, the hostname file will always be created and the hostname will be set statically on systemd systems. Default: `true`.
 - `fqdn` (String) The fully qualified domain name to set.
+- `groups` (List of String) [WIP] List of user groups to create
 - `hostname` (String) The hostname to set.
 - `locale` (String) The locale to set as the system’s locale (e.g. ar_PS).
 - `locale_configfile` (String) The file in which to write the locale configuration (defaults to the distro’s default location).
@@ -31,7 +32,7 @@ Cloud-config file in-memory representation
 - `package_reboot_if_required` (Boolean) Set `true` to reboot the system if required by presence of `/var/run/reboot-required`. Default: `false`.
 - `package_update` (Boolean) Set `true` to update packages. Happens before upgrade or install. Default: `false`.
 - `package_upgrade` (Boolean) Set `true` to upgrade packages. Happens before install. Default: `false`.
-- `packages` (List of String) An array containing a package specification
+- `packages` (List of String) [WIP] An array containing a package specification
 - `prefer_fqdn_over_hostname` (Boolean) If true, the fqdn will be used if it is set. If false, the hostname will be used. If unset, the result is distro-dependent.
 - `preserve_hostname` (Boolean) If true, the hostname will not be changed. Default: `false`.
 - `runcmd` (List of String) Run arbitrary commands at a rc.local-like time-frame with output to the console. Each item will be interpreted by `sh`.
@@ -42,6 +43,8 @@ In order for this config to be applied, SSH may need to be restarted. On systemd
 
 _Changed in version 22.3. Use of non-boolean values for this field is deprecated._
 - `timezone` (String) The timezone to use as represented in /usr/share/zoneinfo.
+- `user` (Block, Optional) The user dictionary values override the `default_user` configuration from `/etc/cloud/cloud.cfg`. The user dictionary keys supported for the `default_user` are the same as the users schema. (see [below for nested schema](#nestedblock--user))
+- `users` (Block List) List of users (see [below for nested schema](#nestedblock--users))
 
 ### Read-Only
 
@@ -66,3 +69,66 @@ Optional:
 
 - `password` (String) User's password
 - `type` (String) The *type* key has a default value of 'hash', and may alternatively be set to 'text' or 'RANDOM'.
+
+
+
+<a id="nestedblock--user"></a>
+### Nested Schema for `user`
+
+Optional:
+
+- `create_groups` (Boolean) Boolean set `false` to disable creation of specified user groups. Default: `true`.
+- `doas` (List of String) List of doas rules to add for a user. doas or opendoas must be installed for rules to take effect.
+- `expiredate` (String) Optional. Date on which the user’s account will be disabled. Default: `null`.
+- `gecos` (String) Optional comment about the user, usually a comma-separated string of real name and contact information.
+- `hashed_passwd` (String, Sensitive) Hash of user password to be applied. This will be applied even if the user is preexisting. To generate this hash, run: `mkpasswd --method=SHA-512 --rounds=500000`. **Note**: Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
+- `homedir` (String) Optional home dir for user. Default: `/home/<username>`.
+- `inactive` (String) Optional string representing the number of days until the user is disabled.
+- `lock_passwd` (Boolean) Disable password login. Default: `true`.
+- `name` (String) The user’s login name. Required otherwise user creation will be skipped for this user.
+- `no_create_home` (Boolean) Do not create home directory. Default: `false`.
+- `no_log_init` (Boolean) Do not initialize lastlog and faillog for user. Default: `false`.
+- `no_user_group` (Boolean) Do not create group named after user. Default: `false`.
+- `passwd` (String, Sensitive) Hash of user password applied when user does not exist. This will NOT be applied if the user already exists. To generate this hash, run: `mkpasswd --method=SHA-512 --rounds=500000` **Note**: Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
+- `plain_text_passwd` (String, Sensitive) Clear text of user password to be applied. This will be applied even if the user is preexisting. **Note**: SSH keys or certificates are a safer choice for logging in to your system. For local escalation, supplying a hashed password is a safer choice than plain text. Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. An exposed plain text password is an immediate security concern. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
+- `primary_group` (String) Primary group for user. Default: `<username>`.
+- `selinux_user` (String) SELinux user for user’s login. Default: the default SELinux user.
+- `shell` (String) Path to the user’s login shell. Default: the host system’s default shell.
+- `snapuser` (String) Specify an email address to create the user as a Snappy user through snap `create-user`. If an Ubuntu SSO account is associated with the address, username and SSH keys will be requested from there.
+- `ssh_authorized_keys` (List of String) List of SSH keys to add to user’s authkeys file. Can not be combined with **ssh_redirect_user**.
+- `ssh_import_id` (List of String) List of ssh ids to import for user. Can not be combined with ssh_redirect_user.
+- `ssh_redirect_user` (Boolean) Boolean set to true to disable SSH logins for this user. When specified, all cloud-provided public SSH keys will be set up in a disabled state for this username. Any SSH login as this username will timeout and prompt with a message to login instead as the **default_username** for this instance. Default: `false`. This key can not be combined with **ssh_import_id** or **ssh_authorized_keys**.
+- `sudo` (List of String) Changed in version 22.2.The value ``false`` is deprecated for this key, use ``null`` instead.
+- `system` (Boolean) Create user as system user with no home directory. Default: `false`.
+- `uid` (Number) The user’s ID. Default value [system default].
+
+
+<a id="nestedblock--users"></a>
+### Nested Schema for `users`
+
+Optional:
+
+- `create_groups` (Boolean) Boolean set `false` to disable creation of specified user groups. Default: `true`.
+- `doas` (List of String) List of doas rules to add for a user. doas or opendoas must be installed for rules to take effect.
+- `expiredate` (String) Optional. Date on which the user’s account will be disabled. Default: `null`.
+- `gecos` (String) Optional comment about the user, usually a comma-separated string of real name and contact information.
+- `hashed_passwd` (String, Sensitive) Hash of user password to be applied. This will be applied even if the user is preexisting. To generate this hash, run: `mkpasswd --method=SHA-512 --rounds=500000`. **Note**: Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
+- `homedir` (String) Optional home dir for user. Default: `/home/<username>`.
+- `inactive` (String) Optional string representing the number of days until the user is disabled.
+- `lock_passwd` (Boolean) Disable password login. Default: `true`.
+- `name` (String) The user’s login name. Required otherwise user creation will be skipped for this user.
+- `no_create_home` (Boolean) Do not create home directory. Default: `false`.
+- `no_log_init` (Boolean) Do not initialize lastlog and faillog for user. Default: `false`.
+- `no_user_group` (Boolean) Do not create group named after user. Default: `false`.
+- `passwd` (String, Sensitive) Hash of user password applied when user does not exist. This will NOT be applied if the user already exists. To generate this hash, run: `mkpasswd --method=SHA-512 --rounds=500000` **Note**: Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
+- `plain_text_passwd` (String, Sensitive) Clear text of user password to be applied. This will be applied even if the user is preexisting. **Note**: SSH keys or certificates are a safer choice for logging in to your system. For local escalation, supplying a hashed password is a safer choice than plain text. Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. An exposed plain text password is an immediate security concern. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
+- `primary_group` (String) Primary group for user. Default: `<username>`.
+- `selinux_user` (String) SELinux user for user’s login. Default: the default SELinux user.
+- `shell` (String) Path to the user’s login shell. Default: the host system’s default shell.
+- `snapuser` (String) Specify an email address to create the user as a Snappy user through snap `create-user`. If an Ubuntu SSO account is associated with the address, username and SSH keys will be requested from there.
+- `ssh_authorized_keys` (List of String) List of SSH keys to add to user’s authkeys file. Can not be combined with **ssh_redirect_user**.
+- `ssh_import_id` (List of String) List of ssh ids to import for user. Can not be combined with ssh_redirect_user.
+- `ssh_redirect_user` (Boolean) Boolean set to true to disable SSH logins for this user. When specified, all cloud-provided public SSH keys will be set up in a disabled state for this username. Any SSH login as this username will timeout and prompt with a message to login instead as the **default_username** for this instance. Default: `false`. This key can not be combined with **ssh_import_id** or **ssh_authorized_keys**.
+- `sudo` (List of String) Changed in version 22.2.The value ``false`` is deprecated for this key, use ``null`` instead.
+- `system` (Boolean) Create user as system user with no home directory. Default: `false`.
+- `uid` (Number) The user’s ID. Default value [system default].

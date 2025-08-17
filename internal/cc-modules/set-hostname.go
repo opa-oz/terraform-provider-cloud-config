@@ -42,13 +42,11 @@ func SetHostname() CCModuleFlat {
 			},
 			"preserve_hostname": schema.BoolAttribute{
 				MarkdownDescription: "If true, the hostname will not be changed. Default: `false`.",
-				// Default:             booldefault.StaticBool(false),
-				Optional: true,
+				Optional:            true,
 			},
 			"create_hostname_file": schema.BoolAttribute{
 				MarkdownDescription: "If `false`, the hostname file (e.g. `/etc/hostname`) will not be created if it does not exist. On systems that use systemd, setting `create_hostname_file` to `false` will set the hostname transiently. If true, the hostname file will always be created and the hostname will be set statically on systemd systems. Default: `true`.",
-				// Default:             booldefault.StaticBool(true),
-				Optional: true,
+				Optional:            true,
 			},
 		},
 	}
