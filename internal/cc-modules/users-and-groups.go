@@ -33,6 +33,7 @@ type User struct {
 	System            types.Bool   `tfsdk:"system"`
 	UID               types.Int32  `tfsdk:"uid"`
 	Sudo              types.List   `tfsdk:"sudo"`
+	Groups            types.List   `tfsdk:"groups"`
 }
 
 type UserOutput struct {
@@ -60,6 +61,7 @@ type UserOutput struct {
 	System            bool     `yaml:"system,omitempty"`
 	UID               *int32   `yaml:"uid,omitempty"`
 	Sudo              []string `yaml:"sudo,omitempty"`
+	Groups            []string `yaml:"groups,omitempty"`
 }
 
 type UsersAndGroupsModel struct {
@@ -90,6 +92,11 @@ func UsersAndGroups() CCModuleFlat {
 // @see https://cloudinit.readthedocs.io/en/latest/reference/modules.html#users-and-groups
 func UsersAndGroupsBlock() CCModuleNested {
 	userAttributes := map[string]schema.Attribute{
+		"groups": schema.ListAttribute{
+			ElementType:         types.StringType,
+			MarkdownDescription: "Groups to add the user to",
+			Optional:            true,
+		},
 		"doas": schema.ListAttribute{
 			ElementType:         types.StringType,
 			MarkdownDescription: "List of doas rules to add for a user. doas or opendoas must be installed for rules to take effect.",

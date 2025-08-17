@@ -542,6 +542,7 @@ user {
   system = true
   sudo = ["idk what is expected here, documentation is silent"]
   uid = 1001
+  groups = ["docker"]
 }
 			`,
 			expectedValues: map[string]string{
@@ -569,6 +570,7 @@ user {
 				"user.system":                "true",
 				"user.sudo.0":                "idk what is expected here, documentation is silent",
 				"user.uid":                   "1001",
+				"user.groups.0":              "docker",
 			},
 			expectedOutput: `
 user:
@@ -599,6 +601,8 @@ user:
     uid: 1001
     sudo:
         - idk what is expected here, documentation is silent
+    groups:
+        - docker 
       `,
 		},
 		{

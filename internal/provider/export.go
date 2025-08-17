@@ -232,6 +232,20 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 			}
 		}
 
+		if !user.Groups.IsUnknown() {
+			elems := user.Groups.Elements()
+
+			if len(elems) > 0 {
+				cmds := make([]string, len(elems))
+				diagnostics := user.Groups.ElementsAs(ctx, &cmds, false)
+
+				if diagnostics.HasError() {
+					return out, diagnostics
+				}
+				out.Groups = cmds
+			}
+		}
+
 		return out, nil
 	}
 

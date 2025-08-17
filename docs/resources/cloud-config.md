@@ -22,6 +22,7 @@ Cloud-config file in-memory representation
  - The users key is used to assign a password to a corresponding pre-existing user.
  - The expire key is used to set whether to expire all user passwords specified by this module, such that a password will need to be reset on the user’s next login. (see [below for nested schema](#nestedblock--chpasswd))
 - `create_hostname_file` (Boolean) If `false`, the hostname file (e.g. `/etc/hostname`) will not be created if it does not exist. On systems that use systemd, setting `create_hostname_file` to `false` will set the hostname transiently. If true, the hostname file will always be created and the hostname will be set statically on systemd systems. Default: `true`.
+- `disable_ec2_metadata` (Boolean) Set `true` to disable IPv4 routes to EC2 metadata. Default: `false`.
 - `fqdn` (String) The fully qualified domain name to set.
 - `groups` (List of String) [WIP] List of user groups to create
 - `hostname` (String) The hostname to set.
@@ -81,6 +82,7 @@ Optional:
 - `doas` (List of String) List of doas rules to add for a user. doas or opendoas must be installed for rules to take effect.
 - `expiredate` (String) Optional. Date on which the user’s account will be disabled. Default: `null`.
 - `gecos` (String) Optional comment about the user, usually a comma-separated string of real name and contact information.
+- `groups` (List of String) Groups to add the user to
 - `hashed_passwd` (String, Sensitive) Hash of user password to be applied. This will be applied even if the user is preexisting. To generate this hash, run: `mkpasswd --method=SHA-512 --rounds=500000`. **Note**: Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
 - `homedir` (String) Optional home dir for user. Default: `/home/<username>`.
 - `inactive` (String) Optional string representing the number of days until the user is disabled.
@@ -112,6 +114,7 @@ Optional:
 - `doas` (List of String) List of doas rules to add for a user. doas or opendoas must be installed for rules to take effect.
 - `expiredate` (String) Optional. Date on which the user’s account will be disabled. Default: `null`.
 - `gecos` (String) Optional comment about the user, usually a comma-separated string of real name and contact information.
+- `groups` (List of String) Groups to add the user to
 - `hashed_passwd` (String, Sensitive) Hash of user password to be applied. This will be applied even if the user is preexisting. To generate this hash, run: `mkpasswd --method=SHA-512 --rounds=500000`. **Note**: Your password might possibly be visible to unprivileged users on your system, depending on your cloud’s security model. Check if your cloud’s IMDS server is visible from an unprivileged user to evaluate risk.
 - `homedir` (String) Optional home dir for user. Default: `/home/<username>`.
 - `inactive` (String) Optional string representing the number of days until the user is disabled.
