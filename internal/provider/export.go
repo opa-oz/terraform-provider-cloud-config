@@ -318,6 +318,8 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 		return output, diagnostics
 	}
 
+	output.DisableEC2Metadata = model.DisableEC2Metadata.ValueBool()
+
 	return output, nil
 }
 

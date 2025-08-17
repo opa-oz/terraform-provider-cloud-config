@@ -145,7 +145,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Byobu              | TBD            |                       |
 | CA Certificates     | TBD            |                       |
 | Chef               | TBD            |                       |
-| Disable EC2 Instance Metadata Service| TBD            |                       |
+| Disable EC2 Instance Metadata Service| **Full**            |                       |
 | Disk Setup          | TBD            |                       |
 | Fan                | TBD            |                       |
 | Final Message      | TBD            |                       |

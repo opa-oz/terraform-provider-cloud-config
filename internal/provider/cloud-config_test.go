@@ -797,3 +797,22 @@ groups:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestDisableEC2InstanceMetadataModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic case",
+			input: `
+disable_ec2_metadata = true
+			`,
+			expectedValues: map[string]string{
+				"disable_ec2_metadata": "true",
+			},
+			expectedOutput: `
+disable_ec2_metadata: true
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}

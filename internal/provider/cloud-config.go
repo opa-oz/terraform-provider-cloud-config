@@ -36,18 +36,20 @@ type CloudConfigResourceModel struct {
 	ccmodules.SetPasswordsModel
 	ccmodules.PkgUpdateUpgradeModel
 	ccmodules.UsersAndGroupsModel
+	ccmodules.DisableEC2InstanceMetadataModel
 }
 
 type ExportModel struct {
-	ccmodules.SetHostnameOutputModel      `yaml:",inline"`
-	ccmodules.LocaleOutputModel           `yaml:",inline"`
-	ccmodules.TimezoneOutputModel         `yaml:",inline"`
-	ccmodules.RunCMDOutputModule          `yaml:",inline"`
-	ccmodules.UpdateEtcHostsOutputModule  `yaml:",inline"`
-	ccmodules.SSHOutputModel              `yaml:",inline"`
-	ccmodules.SetPasswordsOutputModel     `yaml:",inline"`
-	ccmodules.PkgUpdateUpgradeOutputModel `yaml:",inline"`
-	ccmodules.UsersAndGroupsOutputModel   `yaml:",inline"`
+	ccmodules.SetHostnameOutputModel                `yaml:",inline"`
+	ccmodules.LocaleOutputModel                     `yaml:",inline"`
+	ccmodules.TimezoneOutputModel                   `yaml:",inline"`
+	ccmodules.RunCMDOutputModule                    `yaml:",inline"`
+	ccmodules.UpdateEtcHostsOutputModule            `yaml:",inline"`
+	ccmodules.SSHOutputModel                        `yaml:",inline"`
+	ccmodules.SetPasswordsOutputModel               `yaml:",inline"`
+	ccmodules.PkgUpdateUpgradeOutputModel           `yaml:",inline"`
+	ccmodules.UsersAndGroupsOutputModel             `yaml:",inline"`
+	ccmodules.DisableEC2InstanceMetadataOutputModel `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -78,6 +80,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.SetPasswords(),
 		ccmodules.PkgUpdateUpgrade(),
 		ccmodules.UsersAndGroups(),
+		ccmodules.DisableEC2InstanceMetadata(),
 	}
 
 	for _, module := range flat_modules {
