@@ -17,6 +17,31 @@ Cloud-config file in-memory representation
 
 ### Optional
 
+- `apk_repos` (Block, Optional) This module handles configuration of the Alpine Package Keeper (APK) /etc/apk/repositories file. (see [below for nested schema](#nestedblock--apk_repos))
+- `apt_pipelining` (Block, Optional) This module configures APT’s `Acquire::http::Pipeline-Depth` option, which controls how APT handles HTTP pipelining. It may be useful for pipelining to be disabled, because some web servers (such as S3) do not pipeline properly (LP: #948461). (see [below for nested schema](#nestedblock--apt_pipelining))
+- `bootcmd` (List of String) This module runs arbitrary commands very early in the boot process, only slightly after a boothook would run. This is very similar to a boothook, but more user friendly. Commands can be specified as strings.
+
+bootcmd should only be used for things that could not be done later in the boot process.
+
+When writing files, do not use /tmp dir as it races with systemd-tmpfiles-clean (LP: #1707222). Use /run/somedir instead.
+
+Use of INSTANCE_ID variable within this module is deprecated. Use [jinja templates](https://cloudinit.readthedocs.io/en/latest/explanation/format.html#user-data-formats-jinja) with [ v1.instance_id ](https://cloudinit.readthedocs.io/en/latest/explanation/instancedata.html#v1-instance-id) instead.
+- `byobu_by_default` (String) This module controls whether Byobu is enabled or disabled system-wide and for the default system user. If Byobu is to be enabled, this module will ensure it is installed. Likewise, if Byobu is to be disabled, it will be removed (if installed).
+
+Valid configuration options for this module are:
+ - enable-system: enable Byobu system-wide
+ - enable-user: enable Byobu for the default user
+ - disable-system: disable Byobu system-wide
+ - disable-user: disable Byobu for the default user
+ - enable: enable Byobu both system-wide and for the default user
+ - disable: disable Byobu for all users
+ - user: alias for enable-user
+ - system: alias for enable-system
+- `ca_certs` (Block, Optional) This module adds CA certificates to the system’s CA store and updates any related files using the appropriate OS-specific utility. The default CA certificates can be disabled/deleted from use by the system with the configuration option remove_defaults.
+
+Certificates must be specified using valid YAML. To specify a multi-line certificate, the YAML multi-line list syntax must be used.
+
+Alpine Linux requires the ca-certificates package to be installed in order to provide the update-ca-certificates command. (see [below for nested schema](#nestedblock--ca_certs))
 - `chpasswd` (Block, Optional) The chpasswd config key accepts a dictionary containing either (or both) of users and expire.
 
  - The users key is used to assign a password to a corresponding pre-existing user.
@@ -50,6 +75,47 @@ _Changed in version 22.3. Use of non-boolean values for this field is deprecated
 ### Read-Only
 
 - `content` (String, Sensitive) YAML content of cloud-init file
+
+<a id="nestedblock--apk_repos"></a>
+### Nested Schema for `apk_repos`
+
+Optional:
+
+- `alpine_repo` (Block, Optional) (see [below for nested schema](#nestedblock--apk_repos--alpine_repo))
+- `local_repo_base_url` (String) The base URL of an Alpine repository containing unofficial packages.
+- `preserve_repositories` (Boolean) By default, cloud-init will generate a new repositories file /etc/apk/repositories based on any valid configuration settings specified within a apk_repos section of cloud config. To disable this behavior and preserve the repositories file from the pristine image, set **preserve_repositories** to true.
+The **preserve_repositories** option overrides all other config keys that would alter /etc/apk/repositories.
+
+<a id="nestedblock--apk_repos--alpine_repo"></a>
+### Nested Schema for `apk_repos.alpine_repo`
+
+Optional:
+
+- `base_url` (String) The base URL of an Alpine repository, or mirror, to download official packages from. If not specified then it defaults to https://alpine.global.ssl.fastly.net/alpine.
+- `community_enabled` (Boolean) Whether to add the Community repo to the repositories file. By default the Community repo is not included.
+- `testing_enabled` (Boolean) Whether to add the Testing repo to the repositories file. By default the Testing repo is not included. It is only recommended to use the Testing repo on a machine running the Edge version of Alpine as packages installed from Testing may have dependencies that conflict with those in non-Edge Main or Community repos.
+- `version` (String) version
+
+
+
+<a id="nestedblock--apt_pipelining"></a>
+### Nested Schema for `apt_pipelining`
+
+Optional:
+
+- `depth` (Number) Manually specify pipeline depth. This is not recommended.
+- `disable` (Boolean) Disable pipelining altogether
+- `os` (Boolean) Use distro default. This is default behaivor
+
+
+<a id="nestedblock--ca_certs"></a>
+### Nested Schema for `ca_certs`
+
+Optional:
+
+- `remove_defaults` (Boolean) Remove default CA certificates if true. Default: `false`.
+- `trusted` (List of String) List of trusted CA certificates to add.
+
 
 <a id="nestedblock--chpasswd"></a>
 ### Nested Schema for `chpasswd`

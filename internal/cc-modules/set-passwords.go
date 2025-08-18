@@ -1,9 +1,11 @@
 package ccmodules
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/opa-oz/terraform-provider-cloud-config/internal/utils"
 )
@@ -95,6 +97,13 @@ The chpasswd config key accepts a dictionary containing either (or both) of user
 								"type": schema.StringAttribute{
 									MarkdownDescription: "The *type* key has a default value of 'hash', and may alternatively be set to 'text' or 'RANDOM'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf(
+											"RANDOM",
+											"text",
+											"hash",
+										),
+									},
 								},
 							},
 						},

@@ -5,8 +5,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/int32validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/opa-oz/terraform-provider-cloud-config/internal/utils"
 )
 
 type AptPipeliningConfig struct {
@@ -23,30 +25,15 @@ type AptPipeliningOutputModel struct {
 	AptPipelining any `yaml:"apt_pipelining,omitempty"`
 }
 
-// func (self AptPipeliningOutputModel) MarshalYAML() (any, error) {
-// 	if self.AptPipeliningStr == "os" {
-// 		return struct {
-// 			val string `yaml:"apt_pipelining"`
-// 		}{val: "os"}, nil
-// 	}
-//
-// 	if self.AptPipeliningBool {
-// 		return "true", nil
-// 	}
-//
-// 	if self.AptPipeliningNumber != nil {
-// 		return self.AptPipeliningNumber, nil
-// 	}
-//
-// 	return nil, nil
-// }
-
 // AptPipeliningBlock
 // @see https://cloudinit.readthedocs.io/en/latest/reference/modules.html#apt-pipelining
 func AptPipeliningBlock() CCModuleNested {
 	return CCModuleNested{
 		block: map[string]schema.Block{
 			"apt_pipelining": schema.SingleNestedBlock{
+				PlanModifiers: []planmodifier.Object{
+					utils.NullWhen(path.Root("apt_pipelining")),
+				},
 				MarkdownDescription: "This module configures APT’s `Acquire::http::Pipeline-Depth` option, which controls how APT handles HTTP pipelining. It may be useful for pipelining to be disabled, because some web servers (such as S3) do not pipeline properly (LP: #948461).",
 				Attributes: map[string]schema.Attribute{
 					"os": schema.BoolAttribute{

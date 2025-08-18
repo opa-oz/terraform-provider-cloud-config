@@ -56,6 +56,23 @@ func transformRunCMD(ctx context.Context, output *ExportModel, model CloudConfig
 	return nil
 }
 
+func transformBootCMD(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if !model.BootCMD.IsUnknown() {
+		elems := model.BootCMD.Elements()
+
+		if len(elems) > 0 {
+			cmds := make([]string, len(elems))
+			diagnostics := model.BootCMD.ElementsAs(ctx, &cmds, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+			output.BootCMD = cmds
+		}
+	}
+	return nil
+}
+
 func transformManageEtcHosts(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if !model.ManageEtcHostsLocalhost.IsNull() && model.ManageEtcHostsLocalhost.ValueBool() {
 		output.ManageEtcHosts = "localhost"
@@ -287,6 +304,85 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 	return nil
 }
 
+func transformApkConfigure(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	transformApkRepo := func(repo *ccmodules.ApkRepo) (ccmodules.ApkRepoOutput, diag.Diagnostics) {
+		apkRepo := ccmodules.ApkRepoOutput{}
+
+		apkRepo.PreserveRepositories = repo.PreserveRepositories.ValueBool()
+		apkRepo.LocalRepoBaseUrl = repo.LocalRepoBaseUrl.ValueString()
+
+		if repo.AlpineRepo != nil {
+			alpineRepo := ccmodules.AlpineRepoOutput{}
+			alpineRepo.CommunityEnabled = repo.AlpineRepo.CommunityEnabled.ValueBool()
+			alpineRepo.TestingEnabled = repo.AlpineRepo.TestingEnabled.ValueBool()
+
+			alpineRepo.BaseUrl = repo.AlpineRepo.BaseUrl.ValueString()
+			alpineRepo.Version = repo.AlpineRepo.Version.ValueString()
+
+			apkRepo.AlpineRepo = &alpineRepo
+		}
+
+		return apkRepo, nil
+	}
+
+	if model.ApkRepos != nil {
+		repo, diagnostics := transformApkRepo(model.ApkRepos)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		output.ApkRepos = &repo
+	}
+	return nil
+}
+
+func transformAptPipelining(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.AptPipelining == nil {
+		return nil
+	}
+
+	if model.AptPipelining.OS.ValueBool() {
+		// if `os` is true, use value would be string
+		output.AptPipelining = "os"
+	} else if model.AptPipelining.Disable.ValueBool() {
+		// if `disable` is true, it should be false
+		output.AptPipelining = false
+	} else if !model.AptPipelining.Depth.IsNull() {
+		// if `depth` is configured, use as a number
+		output.AptPipelining = model.AptPipelining.Depth.ValueInt32Pointer()
+	}
+
+	return nil
+}
+
+func transformCACertificatesHosts(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.CACerts == nil {
+		return nil
+	}
+
+	caCerts := ccmodules.CACertsOutput{}
+
+	caCerts.RemoveDefaults = model.CACerts.RemoveDefaults.ValueBool()
+
+	if !model.CACerts.Trusted.IsUnknown() {
+		elems := model.CACerts.Trusted.Elements()
+
+		if len(elems) > 0 {
+			certs := make([]string, len(elems))
+			diagnostics := model.CACerts.Trusted.ElementsAs(ctx, &certs, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+
+			caCerts.Trusted = &certs
+		}
+	}
+
+	output.CACerts = &caCerts
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -303,6 +399,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	output.Timezone = model.Timezone.ValueString()
 
 	diagnostics = transformRunCMD(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformBootCMD(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}
@@ -333,6 +434,23 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	output.DisableEC2Metadata = model.DisableEC2Metadata.ValueBool()
+
+	diagnostics = transformApkConfigure(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformAptPipelining(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	output.ByobuByDefault = model.ByobuByDefault.ValueString()
+
+	diagnostics = transformCACertificatesHosts(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
 
 	return output, nil
 }

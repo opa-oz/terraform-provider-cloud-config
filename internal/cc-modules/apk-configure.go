@@ -1,8 +1,11 @@
 package ccmodules
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/opa-oz/terraform-provider-cloud-config/internal/utils"
 )
 
 type AlpineRepo struct {
@@ -45,6 +48,9 @@ func ApkConfigureBlock() CCModuleNested {
 	return CCModuleNested{
 		block: map[string]schema.Block{
 			"apk_repos": schema.SingleNestedBlock{
+				PlanModifiers: []planmodifier.Object{
+					utils.NullWhen(path.Root("apk_repos")),
+				},
 				MarkdownDescription: "This module handles configuration of the Alpine Package Keeper (APK) /etc/apk/repositories file.",
 				Attributes: map[string]schema.Attribute{
 					"preserve_repositories": schema.BoolAttribute{
@@ -85,4 +91,3 @@ The **preserve_repositories** option overrides all other config keys that would 
 		},
 	}
 }
-

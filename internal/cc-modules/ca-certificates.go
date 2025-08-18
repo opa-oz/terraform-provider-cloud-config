@@ -1,8 +1,11 @@
 package ccmodules
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/opa-oz/terraform-provider-cloud-config/internal/utils"
 )
 
 type CACerts struct {
@@ -29,6 +32,9 @@ func CACertificatesBlock() CCModuleNested {
 	return CCModuleNested{
 		block: map[string]schema.Block{
 			"ca_certs": schema.SingleNestedBlock{
+				PlanModifiers: []planmodifier.Object{
+					utils.NullWhen(path.Root("ca_certs")),
+				},
 				MarkdownDescription: `
 This module adds CA certificates to the system’s CA store and updates any related files using the appropriate OS-specific utility. The default CA certificates can be disabled/deleted from use by the system with the configuration option remove_defaults.
 

@@ -143,12 +143,12 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Module             | Support        | Notes                |
 |--------------------|----------------|-----------------------|
 | Ansible            | TBD            |                       |
-| APK Configure      | TBD            |                       |
+| APK Configure      | **Full**            |                       |
 | Apt Configure      | TBD            |                       |
-| Apt Pipelining      | TBD            |                       |
-| Bootcmd             | TBD            |                       |
-| Byobu              | TBD            |                       |
-| CA Certificates     | TBD            |                       |
+| Apt Pipelining      | **Full**            | Funny work-around is involved    |
+| Bootcmd             | _Partial_            |          For now only "array of strings" supported, "array of array of strings" TBD     |
+| Byobu              |  **Full**           |                       |
+| CA Certificates     | **Full**            |                       |
 | Chef               | TBD            |                       |
 | Disable EC2 Instance Metadata Service| **Full**            |                       |
 | Disk Setup          | TBD            |                       |

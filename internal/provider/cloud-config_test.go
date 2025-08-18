@@ -361,6 +361,26 @@ runcmd:
 	resource.Test(t, assembleTestCase(testCases, t))
 }
 
+func TestBootCMDModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic commands",
+			input: `
+bootcmd = [ "cat /etc/hosts" ]
+			`,
+			expectedValues: map[string]string{
+				"bootcmd.0": "cat /etc/hosts",
+			},
+			expectedOutput: `
+bootcmd:
+    - cat /etc/hosts
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestSSHModule(t *testing.T) {
 	testCases := []testCase{
 		{
@@ -827,6 +847,204 @@ disable_ec2_metadata = true
 			},
 			expectedOutput: `
 disable_ec2_metadata: true
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
+func TestApkConfigureModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic case",
+			input: `
+apk_repos {
+  preserve_repositories = true
+}
+			`,
+			expectedValues: map[string]string{
+				"apk_repos.preserve_repositories": "true",
+			},
+			expectedOutput: `
+apk_repos:
+    preserve_repositories: true
+			`,
+		},
+		{
+			name: "Nested case",
+			input: `
+apk_repos {
+  local_repo_base_url = "https://my-local-server/local-alpine"
+
+  alpine_repo {
+        base_url= "https://some-alpine-mirror/alpine"
+        community_enabled= true
+        testing_enabled= true
+        version= "edge"
+      }
+}
+			`,
+			expectedValues: map[string]string{
+				"apk_repos.local_repo_base_url":           "https://my-local-server/local-alpine",
+				"apk_repos.alpine_repo.base_url":          "https://some-alpine-mirror/alpine",
+				"apk_repos.alpine_repo.version":           "edge",
+				"apk_repos.alpine_repo.community_enabled": "true",
+				"apk_repos.alpine_repo.testing_enabled":   "true",
+			},
+			expectedOutput: `
+apk_repos:
+    local_repo_base_url: https://my-local-server/local-alpine
+    alpine_repo:
+        community_enabled: true
+        testing_enabled: true
+        base_url: https://some-alpine-mirror/alpine
+        version: edge
+      `,
+		},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
+func TestAptPipeliningModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic case",
+			input: `
+apt_pipelining {
+      os = true
+}
+			`,
+			expectedValues: map[string]string{
+				"apt_pipelining.os": "true",
+			},
+			expectedOutput: `
+apt_pipelining: os
+			`,
+		},
+		{
+			name: "As a number",
+			input: `
+apt_pipelining {
+      depth = 14
+}
+			`,
+			expectedValues: map[string]string{
+				"apt_pipelining.depth": "14",
+			},
+			expectedOutput: `
+apt_pipelining: 14
+			`,
+		},
+		{
+			name: "disable",
+			input: `
+apt_pipelining {
+      disable = true 
+}
+			`,
+			expectedValues: map[string]string{
+				"apt_pipelining.disable": "true",
+			},
+			expectedOutput: `
+apt_pipelining: false
+			`,
+		},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
+func TestByobuModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+byobu_by_default = "system" 
+			`,
+			expectedValues: map[string]string{
+				"byobu_by_default": "system",
+			},
+			expectedOutput: `
+byobu_by_default: system
+			`,
+		},
+		{
+			name: "Basic",
+			input: `
+byobu_by_default = "disable-system" 
+			`,
+			expectedValues: map[string]string{
+				"byobu_by_default": "disable-system",
+			},
+			expectedOutput: `
+byobu_by_default: disable-system
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
+func TestCACertificatesModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+ca_certs {
+  remove_defaults = true
+  trusted = ["single_line_cert"]
+}
+			`,
+			expectedValues: map[string]string{
+				"ca_certs.remove_defaults": "true",
+				"ca_certs.trusted.0":       "single_line_cert",
+			},
+			expectedOutput: `
+ca_certs:
+    remove_defaults: true
+    trusted:
+        - single_line_cert
+			`,
+		},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
 			`,
 		},
 	}

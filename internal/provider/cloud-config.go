@@ -31,12 +31,17 @@ type CloudConfigResourceModel struct {
 	ccmodules.LocaleModel
 	ccmodules.TimezoneModel
 	ccmodules.RunCMDModule
+	ccmodules.BootCMDModule
 	ccmodules.UpdateEtcHostsModule
 	ccmodules.SSHModel
 	ccmodules.SetPasswordsModel
 	ccmodules.PkgUpdateUpgradeModel
 	ccmodules.UsersAndGroupsModel
 	ccmodules.DisableEC2InstanceMetadataModel
+	ccmodules.ApkConfigureModel
+	ccmodules.AptPipeliningModel
+	ccmodules.ByobuModel
+	ccmodules.CACertificatesModel
 }
 
 type ExportModel struct {
@@ -44,12 +49,17 @@ type ExportModel struct {
 	ccmodules.LocaleOutputModel                     `yaml:",inline"`
 	ccmodules.TimezoneOutputModel                   `yaml:",inline"`
 	ccmodules.RunCMDOutputModule                    `yaml:",inline"`
+	ccmodules.BootCMDOutputModule                   `yaml:",inline"`
 	ccmodules.UpdateEtcHostsOutputModule            `yaml:",inline"`
 	ccmodules.SSHOutputModel                        `yaml:",inline"`
 	ccmodules.SetPasswordsOutputModel               `yaml:",inline"`
 	ccmodules.PkgUpdateUpgradeOutputModel           `yaml:",inline"`
 	ccmodules.UsersAndGroupsOutputModel             `yaml:",inline"`
 	ccmodules.DisableEC2InstanceMetadataOutputModel `yaml:",inline"`
+	ccmodules.ApkConfigureOutputModel               `yaml:",inline"`
+	ccmodules.AptPipeliningOutputModel              `yaml:",inline"`
+	ccmodules.ByobuOutputModel                      `yaml:",inline"`
+	ccmodules.CACertificatesOutputModel             `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -75,12 +85,14 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.Locale(),
 		ccmodules.Timezone(),
 		ccmodules.RunCMD(),
+		ccmodules.BootCMD(),
 		ccmodules.UpdateEtcHosts(),
 		ccmodules.SSH(),
 		ccmodules.SetPasswords(),
 		ccmodules.PkgUpdateUpgrade(),
 		ccmodules.UsersAndGroups(),
 		ccmodules.DisableEC2InstanceMetadata(),
+		ccmodules.Byobu(),
 	}
 
 	for _, module := range flat_modules {
@@ -90,6 +102,9 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 	block_modules := []ccmodules.CCModuleNested{
 		ccmodules.SetPasswordsBlock(),
 		ccmodules.UsersAndGroupsBlock(),
+		ccmodules.ApkConfigureBlock(),
+		ccmodules.AptPipeliningBlock(),
+		ccmodules.CACertificatesBlock(),
 	}
 
 	for _, module := range block_modules {
