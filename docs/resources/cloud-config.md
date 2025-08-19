@@ -48,8 +48,42 @@ Alpine Linux requires the ca-certificates package to be installed in order to pr
  - The expire key is used to set whether to expire all user passwords specified by this module, such that a password will need to be reset on the user’s next login. (see [below for nested schema](#nestedblock--chpasswd))
 - `create_hostname_file` (Boolean) If `false`, the hostname file (e.g. `/etc/hostname`) will not be created if it does not exist. On systems that use systemd, setting `create_hostname_file` to `false` will set the hostname transiently. If true, the hostname file will always be created and the hostname will be set statically on systemd systems. Default: `true`.
 - `disable_ec2_metadata` (Boolean) Set `true` to disable IPv4 routes to EC2 metadata. Default: `false`.
+- `fan` (Block, Optional) This module installs, configures and starts the Ubuntu fan network system ([Read more about Ubuntu Fan](https://wiki.ubuntu.com/FanNetworking)).
+
+If cloud-init sees a fan entry in cloud-config it will:
+
+ - Write config_path with the contents of the config key
+ - Install the package ubuntu-fan if it is not installed
+ - Ensure the service is started (or restarted if was previously running)
+
+Additionally, the ubuntu-fan package will be automatically installed if not present. (see [below for nested schema](#nestedblock--fan))
+- `final_message` (String) This module configures the final message that cloud-init writes. The message is specified as a Jinja template with the following variables set:
+
+ - **version**: cloud-init version
+ - **timestamp**: time at cloud-init finish
+ - **datasource**: cloud-init data source
+ - **uptime**: system uptime
+
+This message is written to the cloud-init log (usually /var/log/cloud-init.log) as well as stderr (which usually redirects to /var/log/cloud-init-output.log).
+
+Upon exit, this module writes the system uptime, timestamp, and cloud-init version to /var/lib/cloud/instance/boot-finished independent of any user data specified for this module.
 - `fqdn` (String) The fully qualified domain name to set.
 - `groups` (List of String) [WIP] List of user groups to create
+- `growpart` (Block, Optional) Growpart resizes partitions to fill the available disk space. This is useful for cloud instances with a larger amount of disk space available than the pristine image uses, as it allows the instance to automatically make use of the extra space.
+
+Note that this only works if the partition to be resized is the last one on a disk with classic partitioning scheme (MBR, BSD, GPT). LVM, Btrfs and ZFS have no such restrictions.
+
+The devices on which to run growpart are specified as a list under the devices key.
+
+There is some functionality overlap between this module and the growroot functionality of cloud-initramfs-tools. However, there are some situations where one tool is able to function and the other is not. The default configuration for both should work for most cloud instances. To explicitly prevent cloud-initramfs-tools from running growroot, the file /etc/growroot-disabled can be created.
+
+By default, both growroot and cc_growpart will check for the existence of this file and will not run if it is present. However, this file can be ignored for cc_growpart by setting ignore_growroot_disabled to true. Read more about cloud-initramfs-tools.
+
+On FreeBSD, there is also the growfs service, which has a lot of overlap with cc_growpart and cc_resizefs, but only works on the root partition. In that configuration, we use it, otherwise, we fall back to gpart.
+
+**Note**: growfs may insert a swap partition, if none is present, unless instructed not to via growfs_swap_size=0 in either kenv(1), or rc.conf(5).
+
+Growpart is enabled by default on the root partition. (see [below for nested schema](#nestedblock--growpart))
 - `hostname` (String) The hostname to set.
 - `locale` (String) The locale to set as the system’s locale (e.g. ar_PS).
 - `locale_configfile` (String) The file in which to write the locale configuration (defaults to the distro’s default location).
@@ -137,6 +171,31 @@ Optional:
 - `password` (String) User's password
 - `type` (String) The *type* key has a default value of 'hash', and may alternatively be set to 'text' or 'RANDOM'.
 
+
+
+<a id="nestedblock--fan"></a>
+### Nested Schema for `fan`
+
+Optional:
+
+- `config` (String) The fan configuration to use as a single multi-line string.
+- `config_path` (String) The path to write the fan configuration to. Default: `/etc/network/fan`.
+
+
+<a id="nestedblock--growpart"></a>
+### Nested Schema for `growpart`
+
+Optional:
+
+- `devices` (List of String) The devices to resize. Each entry can either be the path to the device’s mountpoint in the filesystem or a path to the block device in ‘/dev’. Default: `[/]`
+- `ignore_growroot_disabled` (Boolean) If true, ignore the presence of `/etc/growroot-disabled`. If false and the file exists, then don’t resize. Default: `false`.
+- `mode` (String) The utility to use for resizing. Default: auto
+
+Possible options:
+ - auto - Use any available utility
+ - growpart - Use growpart utility
+ - gpart - Use BSD gpart utility
+ - 'off' - Take no action.
 
 
 <a id="nestedblock--user"></a>

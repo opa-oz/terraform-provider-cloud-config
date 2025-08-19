@@ -140,6 +140,10 @@ make testacc
 
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
+
+**Progress: 25%**
+`[████████------------------------]`
+
 | Module             | Support        | Notes                |
 |--------------------|----------------|-----------------------|
 | Ansible            | TBD            |                       |
