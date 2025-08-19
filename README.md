@@ -152,7 +152,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Chef               | TBD            |                       |
 | Disable EC2 Instance Metadata Service| **Full**            |                       |
 | Disk Setup          | TBD            |                       |
-| Fan                | TBD            |                       |
+| Fan                | **Full**            |                       |
 | Final Message      | TBD            |                       |
 | Growpart           | TBD            |                       |
 | GRUB dpkg           | TBD            |                       |

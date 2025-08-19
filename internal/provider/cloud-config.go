@@ -42,6 +42,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.AptPipeliningModel
 	ccmodules.ByobuModel
 	ccmodules.CACertificatesModel
+	ccmodules.FanModel
 }
 
 type ExportModel struct {
@@ -60,6 +61,7 @@ type ExportModel struct {
 	ccmodules.AptPipeliningOutputModel              `yaml:",inline"`
 	ccmodules.ByobuOutputModel                      `yaml:",inline"`
 	ccmodules.CACertificatesOutputModel             `yaml:",inline"`
+	ccmodules.FanOutputModel                        `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -105,6 +107,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.ApkConfigureBlock(),
 		ccmodules.AptPipeliningBlock(),
 		ccmodules.CACertificatesBlock(),
+		ccmodules.FanBlock(),
 	}
 
 	for _, module := range block_modules {

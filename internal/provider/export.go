@@ -383,6 +383,21 @@ func transformCACertificatesHosts(ctx context.Context, output *ExportModel, mode
 	return nil
 }
 
+func transformFan(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Fan == nil {
+		return nil
+	}
+
+	fan := ccmodules.FanOutput{}
+
+	fan.Config = model.Fan.Config.ValueString()
+	fan.ConfigPath = model.Fan.ConfigPath.ValueString()
+
+	output.Fan = &fan
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -448,6 +463,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	output.ByobuByDefault = model.ByobuByDefault.ValueString()
 
 	diagnostics = transformCACertificatesHosts(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformFan(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

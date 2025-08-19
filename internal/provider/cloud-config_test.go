@@ -1051,3 +1051,41 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestFanModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+fan {
+  config = "My fan config"
+  config_path = "/etc/config/fan"
+}
+			`,
+			expectedValues: map[string]string{
+				"fan.config":      "My fan config",
+				"fan.config_path": "/etc/config/fan",
+			},
+			expectedOutput: `
+fan:
+    config: My fan config
+    config_path: /etc/config/fan
+			`,
+		},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
