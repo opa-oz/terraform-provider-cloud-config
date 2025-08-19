@@ -153,8 +153,8 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Disable EC2 Instance Metadata Service| **Full**            |                       |
 | Disk Setup          | TBD            |                       |
 | Fan                | **Full**            |                       |
-| Final Message      | TBD            |                       |
-| Growpart           | TBD            |                       |
+| Final Message      | **Full**            |                       |
+| Growpart           | **Full**            |                       |
 | GRUB dpkg           | TBD            |                       |
 | Install Hotplug     | TBD            |                       |
 | Keyboard           | TBD            |                       |

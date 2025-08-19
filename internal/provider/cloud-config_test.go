@@ -1089,3 +1089,62 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestFinalMessageModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+final_message = "Let's get it cracking"
+			`,
+			expectedValues: map[string]string{
+				"final_message": "Let's get it cracking",
+			},
+			expectedOutput: "final_message: Let's get it cracking\n",
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
+func TestGrowpartModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+growpart {
+  mode = "auto"
+  ignore_growroot_disabled = true
+  devices = ["/"]
+}
+			`,
+			expectedValues: map[string]string{
+				"growpart.mode":                     "auto",
+				"growpart.ignore_growroot_disabled": "true",
+				"growpart.devices.0":                "/",
+			},
+			expectedOutput: `
+growpart:
+    mode: auto
+    devices:
+        - /
+    ignore_growroot_disabled: true
+			`,
+		},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}

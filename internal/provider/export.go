@@ -398,6 +398,36 @@ func transformFan(_ context.Context, output *ExportModel, model CloudConfigResou
 	return nil
 }
 
+func transformGrowpart(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Growpart == nil {
+		return nil
+	}
+
+	growpart := ccmodules.GrowpartOutput{}
+
+	growpart.IgnoreGrowrootDisabled = model.Growpart.IgnoreGrowrootDisabled.ValueBool()
+	growpart.Mode = model.Growpart.Mode.ValueString()
+
+	if !model.Growpart.Devices.IsUnknown() {
+		elems := model.Growpart.Devices.Elements()
+
+		if len(elems) > 0 {
+			certs := make([]string, len(elems))
+			diagnostics := model.Growpart.Devices.ElementsAs(ctx, &certs, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+
+			growpart.Devices = &certs
+		}
+	}
+
+	output.Growpart = &growpart
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -468,6 +498,13 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformFan(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	output.FinalMessage = model.FinalMessage.ValueString()
+
+	diagnostics = transformGrowpart(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}
