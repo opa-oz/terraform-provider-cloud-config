@@ -45,6 +45,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.FanModel
 	ccmodules.FinalMessageModel
 	ccmodules.GrowpartModel
+	ccmodules.GRUBDpkgModel
 }
 
 type ExportModel struct {
@@ -66,6 +67,7 @@ type ExportModel struct {
 	ccmodules.FanOutputModel                        `yaml:",inline"`
 	ccmodules.FinalMessageOutputModel               `yaml:",inline"`
 	ccmodules.GrowpartOutputModel                   `yaml:",inline"`
+	ccmodules.GRUBDpkgOutputModel                   `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -114,6 +116,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.CACertificatesBlock(),
 		ccmodules.FanBlock(),
 		ccmodules.GrowpartBlock(),
+		ccmodules.GRUBDpkgBlock(),
 	}
 
 	for _, module := range block_modules {

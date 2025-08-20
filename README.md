@@ -159,7 +159,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Fan                | **Full**            |                       |
 | Final Message      | **Full**            |                       |
 | Growpart           | **Full**            |                       |
-| GRUB dpkg           | TBD            |                       |
+| GRUB dpkg           | **Full**            |                       |
 | Install Hotplug     | TBD            |                       |
 | Keyboard           | TBD            |                       |
 | Keys to Console    | TBD            |                       |

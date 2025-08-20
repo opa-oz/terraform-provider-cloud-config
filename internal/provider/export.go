@@ -428,6 +428,23 @@ func transformGrowpart(ctx context.Context, output *ExportModel, model CloudConf
 	return nil
 }
 
+func transformGRUBDpkg(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.GRUBDpkg == nil {
+		return nil
+	}
+
+	config := ccmodules.GRUBDpkgOutput{}
+
+	config.Enabled = model.GRUBDpkg.Enabled.ValueBool()
+	config.GRUBPC_InstallDevicesEmpty = model.GRUBDpkg.GRUBPC_InstallDevicesEmpty.ValueBool()
+	config.GRUBPC_InstallDevices = model.GRUBDpkg.GRUBPC_InstallDevices.ValueString()
+	config.GRUBEFI_InstallDevices = model.GRUBDpkg.GRUBEFI_InstallDevices.ValueString()
+
+	output.GRUBDpkg = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -505,6 +522,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	output.FinalMessage = model.FinalMessage.ValueString()
 
 	diagnostics = transformGrowpart(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformGRUBDpkg(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

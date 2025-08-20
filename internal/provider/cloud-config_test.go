@@ -1148,3 +1148,46 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestGRUBDpkgModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+grub_dpkg {
+  enabled = true
+  grub_pc_install_devices_empty = true
+  grub_pc_install_devices = "/boot"
+  grub_efi_install_devices = "/boot/efi"
+}
+			`,
+			expectedValues: map[string]string{
+				"grub_dpkg.enabled":                       "true",
+				"grub_dpkg.grub_pc_install_devices_empty": "true",
+				"grub_dpkg.grub_pc_install_devices":       "/boot",
+				"grub_dpkg.grub_efi_install_devices":      "/boot/efi",
+			},
+			expectedOutput: `
+grub_dpkg:
+    enabled: true
+    grub-pc/install_devices: /boot
+    grub-pc/install_devices_empty: true
+    grub-efi/install_devices: /boot/efi
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
