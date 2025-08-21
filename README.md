@@ -174,7 +174,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Power State Change  | TBD            |                       |
 | Puppet             | TBD            |                       |
 | Raspberry Pi Configuration| TBD            |                       |
-| Resizefs           | TBD            |                       |
+| Resizefs           | **Full**            |                       |
 | Resolv Conf        | TBD            |                       |
 | Red Hat Subscription| TBD            |                       |
 | Rsyslog            | TBD            |                       |

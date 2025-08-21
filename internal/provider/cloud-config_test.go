@@ -1315,3 +1315,35 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestResizefsModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+resize_rootfs = false
+resize_rootfs_no_block = true
+			`,
+			expectedValues: map[string]string{
+				"resize_rootfs":          "false",
+				"resize_rootfs_no_block": "true",
+			},
+			expectedOutput: `
+resize_rootfs: false
+    `},
+		{
+			name: "On boot",
+			input: `
+resize_rootfs_no_block = true
+			`,
+			expectedValues: map[string]string{
+				"resize_rootfs_no_block": "true",
+			},
+			expectedOutput: `
+resize_rootfs: noblock
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}

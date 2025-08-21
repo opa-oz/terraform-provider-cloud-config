@@ -101,6 +101,14 @@ If this module is executed inside a container, then the debconf database is seed
 - `packages` (List of String) [WIP] An array containing a package specification
 - `prefer_fqdn_over_hostname` (Boolean) If true, the fqdn will be used if it is set. If false, the hostname will be used. If unset, the result is distro-dependent.
 - `preserve_hostname` (Boolean) If true, the hostname will not be changed. Default: `false`.
+- `resize_rootfs` (Boolean) Resize a filesystem to use all available space on partition. This module is useful along with cc_growpart and will ensure that if the root partition has been resized, the root filesystem will be resized along with it.
+
+By default, cc_resizefs will resize the root partition and will block the boot process while the resize command is running.
+
+This module can be disabled altogether by setting resize_rootfs to false.
+
+Default: true
+- `resize_rootfs_no_block` (Boolean) Optionally, the resize operation can be performed in the background while cloud-init continues running modules. This can be enabled by setting resize_rootfs to noblock.
 - `runcmd` (List of String) Run arbitrary commands at a rc.local-like time-frame with output to the console. Each item will be interpreted by `sh`.
 - `ssh` (Block, Optional) For security reasons it may be desirable not to write SSH host keys and their fingerprints to the console. To avoid either of them being written to the console, the emit_keys_to_console config key under the main ssh config key can be used.
 

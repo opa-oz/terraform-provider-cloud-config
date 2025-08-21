@@ -533,6 +533,19 @@ func transformKeysToConsole(ctx context.Context, output *ExportModel, model Clou
 	return nil
 }
 
+func transformResizefs(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	// NOTE: default value is anyway `true`
+	if !model.Resizefs.IsNull() && !model.Resizefs.ValueBool() {
+		output.Resizefs = model.Resizefs.ValueBoolPointer()
+	} else if model.ResizefsNoBlock.ValueBool() {
+		output.Resizefs = "noblock"
+	} else {
+		output.Resizefs = nil
+	}
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -630,6 +643,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformKeysToConsole(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformResizefs(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}
