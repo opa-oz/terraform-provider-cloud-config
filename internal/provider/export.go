@@ -473,6 +473,23 @@ func transformInstallHotplug(ctx context.Context, output *ExportModel, model Clo
 	return nil
 }
 
+func transformKeyboard(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Keyboard == nil {
+		return nil
+	}
+
+	config := ccmodules.KeyboardOutput{
+		Layout:  model.Keyboard.Layout.ValueString(),
+		Model:   model.Keyboard.Model.ValueString(),
+		Variant: model.Keyboard.Variant.ValueString(),
+		Options: model.Keyboard.Options.ValueString(),
+	}
+
+	output.Keyboard = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -560,6 +577,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformInstallHotplug(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformKeyboard(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

@@ -90,6 +90,7 @@ The value placed into the debconf database is in the format expected by the GRUB
 
 If this module is executed inside a container, then the debconf database is seeded with empty values, and install_devices_empty is set to true. (see [below for nested schema](#nestedblock--grub_dpkg))
 - `hostname` (String) The hostname to set.
+- `keyboard` (Block, Optional) Handle keyboard configuration. (see [below for nested schema](#nestedblock--keyboard))
 - `locale` (String) The locale to set as the system’s locale (e.g. ar_PS).
 - `locale_configfile` (String) The file in which to write the locale configuration (defaults to the distro’s default location).
 - `manage_etc_hosts` (Boolean) Whether to manage `/etc/hosts` on the system. If true, render the hosts file using `/etc/cloud/templates/hosts.tmpl` replacing `$hostname` and `$fdqn`.
@@ -219,6 +220,17 @@ Optional:
 - `grub_efi_install_devices` (String) Partition to use as target for grub installation. If unspecified, grub-probe of `/boot/efi` will be used to find the partition.
 - `grub_pc_install_devices` (String) Device to use as target for grub installation. If unspecified, grub-probe of `/boot` will be used to find the device.
 - `grub_pc_install_devices_empty` (Boolean) Sets values for `grub-pc/install_devices_empty`. If unspecified, will be set to true if `grub-pc/install_devices` is empty, otherwise false.
+
+
+<a id="nestedblock--keyboard"></a>
+### Nested Schema for `keyboard`
+
+Optional:
+
+- `layout` (String) Required. Keyboard layout. Corresponds to XKBLAYOUT.
+- `model` (String) Keyboard model. Corresponds to XKBMODEL. Default: `pc105`.
+- `options` (String) Keyboard options. Corresponds to `XKBOPTIONS`.
+- `variant` (String) Required for Alpine Linux, optional otherwise. Keyboard variant. Corresponds to `XKBVARIANT`.
 
 
 <a id="nestedblock--updates"></a>

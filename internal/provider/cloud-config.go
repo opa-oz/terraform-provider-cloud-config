@@ -47,6 +47,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.GrowpartModel
 	ccmodules.GRUBDpkgModel
 	ccmodules.InstallHotplugModel
+	ccmodules.KeyboardModel
 }
 
 type ExportModel struct {
@@ -70,6 +71,7 @@ type ExportModel struct {
 	ccmodules.GrowpartOutputModel                   `yaml:",inline"`
 	ccmodules.GRUBDpkgOutputModel                   `yaml:",inline"`
 	ccmodules.InstallHotplugOutputModel             `yaml:",inline"`
+	ccmodules.KeyboardOutputModel                   `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -120,6 +122,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.GrowpartBlock(),
 		ccmodules.GRUBDpkgBlock(),
 		ccmodules.InstallHotplugBlock(),
+		ccmodules.KeyboardBlock(),
 	}
 
 	for _, module := range block_modules {

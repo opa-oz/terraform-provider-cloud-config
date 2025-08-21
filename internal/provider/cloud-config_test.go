@@ -1229,3 +1229,46 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestKeyboardModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+keyboard {
+  layout = "en_GB"
+  model = "pc105"
+  variant = "some"
+  options = "some"
+}
+			`,
+			expectedValues: map[string]string{
+				"keyboard.layout":  "en_GB",
+				"keyboard.model":   "pc105",
+				"keyboard.variant": "some",
+				"keyboard.options": "some",
+			},
+			expectedOutput: `
+keyboard:
+    layout: en_GB
+    model: pc105
+    variant: some
+    options: some
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
