@@ -162,7 +162,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | GRUB dpkg           | **Full**            |                       |
 | Install Hotplug     | **Full**            |                       |
 | Keyboard           | **Full**            |                       |
-| Keys to Console    | TBD            |                       |
+| Keys to Console    | **Full**            |                       |
 | Landscape          | TBD            |                       |
 | Locale             | **Full**            |                       |
 | LXD                | TBD            |                       |

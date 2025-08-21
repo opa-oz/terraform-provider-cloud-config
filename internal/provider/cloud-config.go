@@ -48,6 +48,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.GRUBDpkgModel
 	ccmodules.InstallHotplugModel
 	ccmodules.KeyboardModel
+	ccmodules.KeysToConsoleModel
 }
 
 type ExportModel struct {
@@ -72,6 +73,7 @@ type ExportModel struct {
 	ccmodules.GRUBDpkgOutputModel                   `yaml:",inline"`
 	ccmodules.InstallHotplugOutputModel             `yaml:",inline"`
 	ccmodules.KeyboardOutputModel                   `yaml:",inline"`
+	ccmodules.KeysToConsoleOutputModel              `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -106,6 +108,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.DisableEC2InstanceMetadata(),
 		ccmodules.Byobu(),
 		ccmodules.FinalMessage(),
+		ccmodules.KeysToConsole(),
 	}
 
 	for _, module := range flat_modules {
@@ -123,6 +126,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.GRUBDpkgBlock(),
 		ccmodules.InstallHotplugBlock(),
 		ccmodules.KeyboardBlock(),
+		ccmodules.KeysToConsoleBlock(),
 	}
 
 	for _, module := range block_modules {

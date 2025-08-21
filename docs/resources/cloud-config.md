@@ -102,7 +102,14 @@ If this module is executed inside a container, then the debconf database is seed
 - `prefer_fqdn_over_hostname` (Boolean) If true, the fqdn will be used if it is set. If false, the hostname will be used. If unset, the result is distro-dependent.
 - `preserve_hostname` (Boolean) If true, the hostname will not be changed. Default: `false`.
 - `runcmd` (List of String) Run arbitrary commands at a rc.local-like time-frame with output to the console. Each item will be interpreted by `sh`.
+- `ssh` (Block, Optional) For security reasons it may be desirable not to write SSH host keys and their fingerprints to the console. To avoid either of them being written to the console, the emit_keys_to_console config key under the main ssh config key can be used.
+
+To avoid the fingerprint of types of SSH host keys being written to console the ssh_fp_console_blacklist config key can be used. By default, all types of keys will have their fingerprints written to console.
+
+To avoid host keys of a key type being written to console the ssh_key_console_blacklist config key can be used. By default, all supported host keys are written to console. (see [below for nested schema](#nestedblock--ssh))
 - `ssh_authorized_keys` (List of String) The SSH public keys to add `.ssh/authorized_keys` in the default user’s home directory.
+- `ssh_fp_console_blacklist` (List of String) Avoid printing matching SSH fingerprints to the system console.
+- `ssh_key_console_blacklist` (List of String) Avoid printing matching SSH key types to the system console.
 - `ssh_pwauth` (Boolean) Sets whether or not to accept password authentication. true will enable password auth. false will disable. *Default*: leave the value unchanged. 
 
 In order for this config to be applied, SSH may need to be restarted. On systemd systems, this restart will only happen if the SSH service has already been started. On non-systemd systems, a restart will be attempted regardless of the service state.
@@ -231,6 +238,14 @@ Optional:
 - `model` (String) Keyboard model. Corresponds to XKBMODEL. Default: `pc105`.
 - `options` (String) Keyboard options. Corresponds to `XKBOPTIONS`.
 - `variant` (String) Required for Alpine Linux, optional otherwise. Keyboard variant. Corresponds to `XKBVARIANT`.
+
+
+<a id="nestedblock--ssh"></a>
+### Nested Schema for `ssh`
+
+Optional:
+
+- `emit_keys_to_console` (Boolean) Set false to avoid printing SSH keys to system console. Default: `true`.
 
 
 <a id="nestedblock--updates"></a>

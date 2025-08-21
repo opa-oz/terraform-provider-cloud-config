@@ -490,6 +490,49 @@ func transformKeyboard(_ context.Context, output *ExportModel, model CloudConfig
 	return nil
 }
 
+func transformKeysToConsole(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.SSH != nil {
+		// NOTE: default value is anyway `true`
+		if !model.SSH.EmitKeysToConsole.IsNull() && !model.SSH.EmitKeysToConsole.ValueBool() {
+			output.SSH = &ccmodules.SSHOutput{
+				EmitKeysToConsole: model.SSH.EmitKeysToConsole.ValueBoolPointer(),
+			}
+		}
+	}
+
+	if !model.SSHKeyConsoleBlacklist.IsUnknown() {
+		elems := model.SSHKeyConsoleBlacklist.Elements()
+
+		if len(elems) > 0 {
+			whens := make([]string, len(elems))
+			diagnostics := model.SSHKeyConsoleBlacklist.ElementsAs(ctx, &whens, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+
+			output.SSHKeyConsoleBlacklist = &whens
+		}
+	}
+
+	if !model.SSHFPConsoleBlacklist.IsUnknown() {
+		elems := model.SSHFPConsoleBlacklist.Elements()
+
+		if len(elems) > 0 {
+			whens := make([]string, len(elems))
+			diagnostics := model.SSHFPConsoleBlacklist.ElementsAs(ctx, &whens, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+
+			output.SSHFPConsoleBlacklist = &whens
+		}
+	}
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -582,6 +625,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformKeyboard(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformKeysToConsole(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

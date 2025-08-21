@@ -1272,3 +1272,46 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestKeysToConsoleModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+ssh {
+  emit_keys_to_console = false
+}
+
+ssh_key_console_blacklist = ["rsa"]
+ssh_fp_console_blacklist = ["E25451E0221B5773DEBFF178ECDACB160995AA89"]
+			`,
+			expectedValues: map[string]string{
+				"ssh.emit_keys_to_console":    "false",
+				"ssh_key_console_blacklist.0": "rsa",
+				"ssh_fp_console_blacklist.0":  "E25451E0221B5773DEBFF178ECDACB160995AA89",
+			},
+			expectedOutput: `
+ssh:
+    emit_keys_to_console: false
+ssh_key_console_blacklist:
+    - rsa
+ssh_fp_console_blacklist:
+    - E25451E0221B5773DEBFF178ECDACB160995AA89
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
