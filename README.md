@@ -141,8 +141,8 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 25%**
-`[████████------------------------]`
+**Progress: 29%**
+`[█████████-----------------------]`
 
 | Module             | Support        | Notes                |
 |--------------------|----------------|-----------------------|
@@ -160,7 +160,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Final Message      | **Full**            |                       |
 | Growpart           | **Full**            |                       |
 | GRUB dpkg           | **Full**            |                       |
-| Install Hotplug     | TBD            |                       |
+| Install Hotplug     | **Full**            |                       |
 | Keyboard           | TBD            |                       |
 | Keys to Console    | TBD            |                       |
 | Landscape          | TBD            |                       |

@@ -108,6 +108,13 @@ In order for this config to be applied, SSH may need to be restarted. On systemd
 
 _Changed in version 22.3. Use of non-boolean values for this field is deprecated._
 - `timezone` (String) The timezone to use as represented in /usr/share/zoneinfo.
+- `updates` (Block, Optional) This module will install the udev rules to enable hotplug if supported by the datasource and enabled in the user-data. The udev rules will be installed as /etc/udev/rules.d/90-cloud-init-hook-hotplug.rules.
+
+When hotplug is enabled, newly added network devices will be added to the system by cloud-init. After udev detects the event, cloud-init will refresh the instance metadata from the datasource, detect the device in the updated metadata, then apply the updated network configuration.
+
+Udev rules are installed while cloud-init is running, which means that devices which are added during boot might not be configured. To work around this limitation, one can wait until cloud-init has completed before hotplugging devices.
+
+Currently supported datasources: **Openstack, EC2** (see [below for nested schema](#nestedblock--updates))
 - `user` (Block, Optional) The user dictionary values override the `default_user` configuration from `/etc/cloud/cloud.cfg`. The user dictionary keys supported for the `default_user` are the same as the users schema. (see [below for nested schema](#nestedblock--user))
 - `users` (Block List) List of users (see [below for nested schema](#nestedblock--users))
 
@@ -212,6 +219,22 @@ Optional:
 - `grub_efi_install_devices` (String) Partition to use as target for grub installation. If unspecified, grub-probe of `/boot/efi` will be used to find the partition.
 - `grub_pc_install_devices` (String) Device to use as target for grub installation. If unspecified, grub-probe of `/boot` will be used to find the device.
 - `grub_pc_install_devices_empty` (Boolean) Sets values for `grub-pc/install_devices_empty`. If unspecified, will be set to true if `grub-pc/install_devices` is empty, otherwise false.
+
+
+<a id="nestedblock--updates"></a>
+### Nested Schema for `updates`
+
+Optional:
+
+- `network` (Block, Optional) (see [below for nested schema](#nestedblock--updates--network))
+
+<a id="nestedblock--updates--network"></a>
+### Nested Schema for `updates.network`
+
+Optional:
+
+- `when` (List of String) array of boot-new-instance/boot-legacy/boot/hotplug
+
 
 
 <a id="nestedblock--user"></a>

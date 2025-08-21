@@ -445,6 +445,34 @@ func transformGRUBDpkg(_ context.Context, output *ExportModel, model CloudConfig
 	return nil
 }
 
+func transformInstallHotplug(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Updates == nil || model.Updates.Network == nil {
+		return nil
+	}
+
+	config := ccmodules.UpdatesOutput{
+		Network: &ccmodules.NetworkOutput{},
+	}
+
+	if !model.Updates.Network.When.IsUnknown() {
+		elems := model.Updates.Network.When.Elements()
+
+		if len(elems) > 0 {
+			whens := make([]string, len(elems))
+			diagnostics := model.Updates.Network.When.ElementsAs(ctx, &whens, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+
+			config.Network.When = &whens
+			output.Updates = &config
+		}
+	}
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -527,6 +555,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformGRUBDpkg(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformInstallHotplug(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}
