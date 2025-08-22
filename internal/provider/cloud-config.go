@@ -50,6 +50,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.KeyboardModel
 	ccmodules.KeysToConsoleModel
 	ccmodules.ResizefsModel
+	ccmodules.SaltMinionModel
 }
 
 type ExportModel struct {
@@ -76,6 +77,7 @@ type ExportModel struct {
 	ccmodules.KeyboardOutputModel                   `yaml:",inline"`
 	ccmodules.KeysToConsoleOutputModel              `yaml:",inline"`
 	ccmodules.ResizefsOutputModel                   `yaml:",inline"`
+	ccmodules.SaltMinionOutputModel                 `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -130,6 +132,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.InstallHotplugBlock(),
 		ccmodules.KeyboardBlock(),
 		ccmodules.KeysToConsoleBlock(),
+		ccmodules.SaltMinionBlock(),
 	}
 
 	for _, module := range block_modules {

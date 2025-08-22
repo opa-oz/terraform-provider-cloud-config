@@ -1347,3 +1347,52 @@ resize_rootfs: noblock
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestSaltMinionModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+salt_minion {
+  config_dir = "/etc/salt"
+  pkg_name = "salt-minion"
+  pki_dir = "/etc/salt/pki/minion"
+  private_key = "------BEGIN PRIVATE KEY------"
+  public_key = "------BEGIN PUBLIC KEY-------"
+  service_name = "salt-minion"
+}
+      `,
+			expectedValues: map[string]string{
+				"salt_minion.config_dir":   "/etc/salt",
+				"salt_minion.pkg_name":     "salt-minion",
+				"salt_minion.pki_dir":      "/etc/salt/pki/minion",
+				"salt_minion.private_key":  "------BEGIN PRIVATE KEY------",
+				"salt_minion.public_key":   "------BEGIN PUBLIC KEY-------",
+				"salt_minion.service_name": "salt-minion",
+			},
+			expectedOutput: `
+salt_minion:
+    pkg_name: salt-minion
+    service_name: salt-minion
+    config_dir: /etc/salt
+    public_key: '------BEGIN PUBLIC KEY-------'
+    private_key: '------BEGIN PRIVATE KEY------'
+    pki_dir: /etc/salt/pki/minion
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}

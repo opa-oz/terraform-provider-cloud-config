@@ -1,0 +1,26 @@
+---
+layout: page
+page_title: "Example configuration"
+subcategory: Guides
+description: |-
+    Example configuration from real cloud-init
+---
+
+# Example configuration
+
+## Original cloud-config
+
+[Original source](https://www.techtutorials.tv/sections/promox/automate-vm-creation-on-proxmox-with-ansible/)
+
+{{ codefile "yaml" "examples/guides/example-configuration/before.yaml" }}
+
+## As terraform configuration
+
+_Kudos to [bpg/terraform-provider-proxmox](https://github.com/bpg/terraform-provider-proxmox/tree/main)_
+
+{{ codefile "terraform" "examples/guides/example-configuration/template.tf" }}
+
+After `terraform apply`, if we check on a host, we will get:
+
+{{ codefile "yaml" "examples/guides/example-configuration/after.yaml" }}
+

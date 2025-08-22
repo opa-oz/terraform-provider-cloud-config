@@ -141,7 +141,7 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 39%**
+**Progress: 40%**
 `[█████████████———————————————]`
 
 | Module             | Support        | Notes                |
@@ -179,7 +179,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Red Hat Subscription| TBD            |                       |
 | Rsyslog            | TBD            |                       |
 | Runcmd             | _Partial_            |     For now only "array of strings" supported, "array of array of strings" TBD                |
-| Salt Minion        | TBD            |                       |
+| Salt Minion        | _Partial_            |   `conf` and `grains` is yet to be supported    |
 | Scripts Per Boot   | **Full**            |  This module actually doesn't have any configuration   |
 | Scripts Per Instance| **Full**            |  This module actually doesn't have any configuration   |
 | Scripts Per Once   | **Full**            |  This module actually doesn't have any configuration   |

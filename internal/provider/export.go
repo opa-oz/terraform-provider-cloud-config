@@ -546,6 +546,25 @@ func transformResizefs(_ context.Context, output *ExportModel, model CloudConfig
 	return nil
 }
 
+func transformSaltMinion(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.SaltMinion == nil {
+		return nil
+	}
+
+	config := ccmodules.SaltMinionOutput{}
+
+	config.PkgName = model.SaltMinion.PkgName.ValueString()
+	config.ServiceName = model.SaltMinion.ServiceName.ValueString()
+	config.ConfigDir = model.SaltMinion.ConfigDir.ValueString()
+	config.PublicKey = model.SaltMinion.PublicKey.ValueString()
+	config.PrivateKey = model.SaltMinion.PrivateKey.ValueString()
+	config.PkiDir = model.SaltMinion.PkiDir.ValueString()
+
+	output.SaltMinion = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -648,6 +667,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformResizefs(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformSaltMinion(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

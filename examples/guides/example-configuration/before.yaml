@@ -1,0 +1,25 @@
+#cloud-config
+hostname: ubuntu
+manage_etc_hosts: true
+fqdn: ubuntu.lan
+user: ansible
+ssh_authorized_keys:
+  - let's pretend it's ssh public key  
+chpasswd:
+  expire: False
+users:
+  - default
+package_update: true
+package_upgrade: true
+timezone: Asia/Tokyo
+packages:
+  - qemu-guest-agent
+  - ufw
+runcmd:
+    - systemctl enable qemu-guest-agent
+    - systemctl start qemu-guest-agent
+    - ufw limit proto tcp to any port 22
+    - ufw enable
+    - locale-gen en_GB.UTF-8
+    - localectl set-locale LANG=en_GB.UTF-8
+    - chfn -f Ansible ansible
