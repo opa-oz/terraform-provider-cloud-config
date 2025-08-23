@@ -565,6 +565,20 @@ func transformSaltMinion(_ context.Context, output *ExportModel, model CloudConf
 	return nil
 }
 
+func transformUbuntuAutoinstall(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Autoinstall == nil {
+		return nil
+	}
+
+	config := ccmodules.AutoinstallOutput{}
+
+	config.Version = model.Autoinstall.Version.ValueInt32()
+
+	output.Autoinstall = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -672,6 +686,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformSaltMinion(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformUbuntuAutoinstall(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

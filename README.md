@@ -141,8 +141,8 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 40%**
-`[█████████████———————————————]`
+**Progress: 42%**
+`[█████████████——————————————]`
 
 | Module             | Support        | Notes                |
 |--------------------|----------------|-----------------------|
@@ -195,7 +195,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | SSH Import ID      | TBD            |                       |
 | Timezone           | **Full**            |           No brainer            |
 | Ubuntu Drivers     | TBD            |                       |
-| Ubuntu Autoinstall | TBD            |                       |
+| Ubuntu Autoinstall | **Full**            |                       |
 | Ubuntu Pro         | TBD            |                       |
 | Update Etc Hosts  | **Full**            |      Supported as two fields, because in original it's `true/false/'localhost'`                 |
 | Update Hostname    | TBD            |                       |

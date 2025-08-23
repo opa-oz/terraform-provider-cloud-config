@@ -19,6 +19,13 @@ Cloud-config file in-memory representation
 
 - `apk_repos` (Block, Optional) This module handles configuration of the Alpine Package Keeper (APK) /etc/apk/repositories file. (see [below for nested schema](#nestedblock--apk_repos))
 - `apt_pipelining` (Block, Optional) This module configures APT’s `Acquire::http::Pipeline-Depth` option, which controls how APT handles HTTP pipelining. It may be useful for pipelining to be disabled, because some web servers (such as S3) do not pipeline properly (LP: #948461). (see [below for nested schema](#nestedblock--apt_pipelining))
+- `autoinstall` (Block, Optional) **Cloud-init ignores this key and its values. It is used by Subiquity, the Ubuntu Autoinstaller. See: https://ubuntu.com/server/docs/install/autoinstall-reference.**
+
+Cloud-init is used by the Ubuntu installer in two stages. The autoinstall key may contain a configuration for the Ubuntu installer.
+
+Cloud-init verifies that an autoinstall key contains a version key and that the installer package is present on the system.
+
+The Ubuntu installer might pass part of this configuration to cloud-init during a later boot as part of the install process. See [the Ubuntu installer documentation](https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html#user-data) for more information. Please direct Ubuntu installer questions to their IRC channel (#ubuntu-server on Libera). (see [below for nested schema](#nestedblock--autoinstall))
 - `bootcmd` (List of String) This module runs arbitrary commands very early in the boot process, only slightly after a boothook would run. This is very similar to a boothook, but more user friendly. Commands can be specified as strings.
 
 bootcmd should only be used for things that could not be done later in the boot process.
@@ -175,6 +182,14 @@ Optional:
 - `depth` (Number) Manually specify pipeline depth. This is not recommended.
 - `disable` (Boolean) Disable pipelining altogether
 - `os` (Boolean) Use distro default. This is default behaivor
+
+
+<a id="nestedblock--autoinstall"></a>
+### Nested Schema for `autoinstall`
+
+Optional:
+
+- `version` (Number)
 
 
 <a id="nestedblock--ca_certs"></a>

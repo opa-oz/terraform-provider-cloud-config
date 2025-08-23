@@ -51,6 +51,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.KeysToConsoleModel
 	ccmodules.ResizefsModel
 	ccmodules.SaltMinionModel
+	ccmodules.UbuntuAutoinstallModel
 }
 
 type ExportModel struct {
@@ -78,6 +79,7 @@ type ExportModel struct {
 	ccmodules.KeysToConsoleOutputModel              `yaml:",inline"`
 	ccmodules.ResizefsOutputModel                   `yaml:",inline"`
 	ccmodules.SaltMinionOutputModel                 `yaml:",inline"`
+	ccmodules.UbuntuAutoinstallOutputModel          `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -133,6 +135,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.KeyboardBlock(),
 		ccmodules.KeysToConsoleBlock(),
 		ccmodules.SaltMinionBlock(),
+		ccmodules.UbuntuAutoinstallBlock(),
 	}
 
 	for _, module := range block_modules {
