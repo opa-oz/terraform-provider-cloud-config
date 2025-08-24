@@ -579,6 +579,36 @@ func transformUbuntuAutoinstall(_ context.Context, output *ExportModel, model Cl
 	return nil
 }
 
+func transformPowerStateChange(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.PowerState == nil {
+		return nil
+	}
+
+	config := ccmodules.PowerStateOutput{}
+
+	config.Mode = model.PowerState.Mode.ValueString()
+	config.Message = model.PowerState.Message.ValueString()
+
+	config.Timeout = model.PowerState.Timeout.ValueInt64()
+
+	if model.PowerState.NoDelay.ValueBool() {
+		// If `no_delay` is true - value is `now`
+		config.Delay = "now"
+	} else if !model.PowerState.Delay.IsUnknown() && !model.PowerState.Delay.IsNull() {
+		config.Delay = model.PowerState.Delay.ValueInt64()
+	}
+
+	if !model.PowerState.ConditionCmd.IsUnknown() && !model.PowerState.ConditionCmd.IsNull() {
+		config.Condition = model.PowerState.ConditionCmd.ValueString()
+	} else if !model.PowerState.Condition.IsUnknown() {
+		config.Condition = model.PowerState.Condition.ValueBool()
+	}
+
+	output.PowerState = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -691,6 +721,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformUbuntuAutoinstall(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformPowerStateChange(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

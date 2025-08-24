@@ -106,6 +106,14 @@ If this module is executed inside a container, then the debconf database is seed
 - `package_update` (Boolean) Set `true` to update packages. Happens before upgrade or install. Default: `false`.
 - `package_upgrade` (Boolean) Set `true` to upgrade packages. Happens before install. Default: `false`.
 - `packages` (List of String) [WIP] An array containing a package specification
+- `power_state` (Block, Optional) This module handles shutdown/reboot after all config modules have been run. By default it will take no action, and the system will keep running unless a package installation/upgrade requires a system reboot (e.g. installing a new kernel) and package_reboot_if_required is true.
+
+Using this module ensures that cloud-init is entirely finished with modules that would be executed. An example to distinguish delay from timeout:
+
+If you delay 5 (5 minutes) and have a timeout of 120 (2 minutes), the max time until shutdown will be 7 minutes, though it could be as soon as 5 minutes. Cloud-init will invoke ‘shutdown +5’ after the process finishes, or when ‘timeout’ seconds have elapsed.
+
+**NOTE**
+With Alpine Linux any message value specified is ignored as Alpine’s halt, poweroff, and reboot commands do not support broadcasting a message. (see [below for nested schema](#nestedblock--power_state))
 - `prefer_fqdn_over_hostname` (Boolean) If true, the fqdn will be used if it is set. If false, the hostname will be used. If unset, the result is distro-dependent.
 - `preserve_hostname` (Boolean) If true, the hostname will not be changed. Default: `false`.
 - `resize_rootfs` (Boolean) Resize a filesystem to use all available space on partition. This module is useful along with cc_growpart and will ensure that if the root partition has been resized, the root filesystem will be resized along with it.
@@ -268,6 +276,20 @@ Optional:
 - `model` (String) Keyboard model. Corresponds to XKBMODEL. Default: `pc105`.
 - `options` (String) Keyboard options. Corresponds to `XKBOPTIONS`.
 - `variant` (String) Required for Alpine Linux, optional otherwise. Keyboard variant. Corresponds to `XKBVARIANT`.
+
+
+<a id="nestedblock--power_state"></a>
+### Nested Schema for `power_state`
+
+Optional:
+
+- `condition` (Boolean) Apply state change only if condition is met. May be boolean true (always met), false (never met).  Defaults to 'true'
+- `condition_cmd` (String) For command formatting, see the documentation for `cc_runcmd`. If exit code is 0, condition is met, otherwise not.
+- `delay` (Number) Time in minutes to delay after cloud-init has finished. Can be now or an integer specifying the number of minutes to delay. Default: `now`.
+- `message` (String) Optional message to display to the user when the system is powering off or rebooting.
+- `mode` (String) Must be one of poweroff, halt, or reboot.
+- `no_delay` (Boolean) Apply changes right after cloud-init finish. Same as `delay: now`. Default `true`
+- `timeout` (Number) Time in seconds to wait for the cloud-init process to finish before executing shutdown. Default: `30`.
 
 
 <a id="nestedblock--salt_minion"></a>

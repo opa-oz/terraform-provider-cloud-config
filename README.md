@@ -171,7 +171,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | NTP                | TBD            |                       |
 | Package Update Upgrade Install| _Partial_            |    Attributes `apt` and `snap` aren't supported                  |
 | Phone Home          | TBD            |                       | 
-| Power State Change  | TBD            |                       |
+| Power State Change  | **Full**            |  Multiple workarounds are in place to reflect multi-type values of original    |
 | Puppet             | TBD            |                       |
 | Raspberry Pi Configuration| TBD            |                       |
 | Resizefs           | **Full**            |                       |

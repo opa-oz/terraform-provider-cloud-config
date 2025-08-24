@@ -1430,3 +1430,77 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestPowerStateChangeModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+power_state {
+      delay = 19 
+      mode = "halt" 
+      message = "Charming message"
+      timeout = 100
+      condition_cmd = "cat /etc/log"
+}
+      `,
+			expectedValues: map[string]string{
+				"power_state.delay":         "19",
+				"power_state.mode":          "halt",
+				"power_state.message":       "Charming message",
+				"power_state.timeout":       "100",
+				"power_state.condition_cmd": "cat /etc/log",
+			},
+			expectedOutput: `
+power_state:
+    delay: 19
+    mode: halt
+    message: Charming message
+    timeout: 100
+    condition: cat /etc/log
+
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+		{
+			name: "Complex case",
+			input: `
+power_state {
+      no_delay = true
+      mode = "halt" 
+      message = "Charming message"
+      timeout = 100
+      condition = true
+}
+      `,
+			expectedValues: map[string]string{
+				"power_state.no_delay":  "true",
+				"power_state.mode":      "halt",
+				"power_state.message":   "Charming message",
+				"power_state.timeout":   "100",
+				"power_state.condition": "true",
+			},
+			expectedOutput: `
+power_state:
+    delay: now
+    mode: halt
+    message: Charming message
+    timeout: 100
+    condition: true 
+
+		`},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
