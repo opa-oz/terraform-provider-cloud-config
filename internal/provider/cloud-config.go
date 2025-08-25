@@ -54,6 +54,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.UbuntuAutoinstallModel
 	ccmodules.PowerStateModel
 	ccmodules.PhoneHomeModel
+	ccmodules.LandscapeModel
 }
 
 type ExportModel struct {
@@ -84,6 +85,7 @@ type ExportModel struct {
 	ccmodules.UbuntuAutoinstallOutputModel          `yaml:",inline"`
 	ccmodules.PowerStateOutputModel                 `yaml:",inline"`
 	ccmodules.PhoneHomeOutputModel                  `yaml:",inline"`
+	ccmodules.LandscapeOutputModel                  `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -142,6 +144,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.UbuntuAutoinstallBlock(),
 		ccmodules.PowerStateChangeBlock(),
 		ccmodules.PhoneHomeBlock(),
+		ccmodules.LandscapeBlock(),
 	}
 
 	for _, module := range block_modules {

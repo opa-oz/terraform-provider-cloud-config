@@ -98,6 +98,11 @@ The value placed into the debconf database is in the format expected by the GRUB
 If this module is executed inside a container, then the debconf database is seeded with empty values, and install_devices_empty is set to true. (see [below for nested schema](#nestedblock--grub_dpkg))
 - `hostname` (String) The hostname to set.
 - `keyboard` (Block, Optional) Handle keyboard configuration. (see [below for nested schema](#nestedblock--keyboard))
+- `landscape` (Block, Optional) This module installs and configures landscape-client. The Landscape client will only be installed if the key landscape is present in config.
+
+Landscape client configuration is given under the client key under the main landscape config key. The config parameters are not interpreted by cloud-init, but rather are converted into a ConfigObj-formatted file and written out to the [client] section in /etc/landscape/client.conf. The following default client config is provided, but can be overridden
+
+If tags is defined, its contents should be a string delimited with a comma (“,”) rather than a list. (see [below for nested schema](#nestedblock--landscape))
 - `locale` (String) The locale to set as the system’s locale (e.g. ar_PS).
 - `locale_configfile` (String) The file in which to write the locale configuration (defaults to the distro’s default location).
 - `manage_etc_hosts` (Boolean) Whether to manage `/etc/hosts` on the system. If true, render the hosts file using `/etc/cloud/templates/hosts.tmpl` replacing `$hostname` and `$fdqn`.
@@ -106,6 +111,20 @@ If this module is executed inside a container, then the debconf database is seed
 - `package_update` (Boolean) Set `true` to update packages. Happens before upgrade or install. Default: `false`.
 - `package_upgrade` (Boolean) Set `true` to upgrade packages. Happens before install. Default: `false`.
 - `packages` (List of String) [WIP] An array containing a package specification
+- `phone_home` (Block, Optional) This module can be used to post data to a remote host after boot is complete.
+
+Either all data can be posted, or a list of keys to post.
+
+Available keys are:
+
+- pub_key_rsa
+- pub_key_ecdsa
+- pub_key_ed25519
+- instance_id
+- hostname
+- fqdn
+
+Data is sent as x-www-form-urlencoded arguments. (see [below for nested schema](#nestedblock--phone_home))
 - `power_state` (Block, Optional) This module handles shutdown/reboot after all config modules have been run. By default it will take no action, and the system will keep running unless a package installation/upgrade requires a system reboot (e.g. installing a new kernel) and package_reboot_if_required is true.
 
 Using this module ensures that cloud-init is entirely finished with modules that would be executed. An example to distinguish delay from timeout:
@@ -276,6 +295,41 @@ Optional:
 - `model` (String) Keyboard model. Corresponds to XKBMODEL. Default: `pc105`.
 - `options` (String) Keyboard options. Corresponds to `XKBOPTIONS`.
 - `variant` (String) Required for Alpine Linux, optional otherwise. Keyboard variant. Corresponds to `XKBVARIANT`.
+
+
+<a id="nestedblock--landscape"></a>
+### Nested Schema for `landscape`
+
+Optional:
+
+- `client` (Block, Optional) (see [below for nested schema](#nestedblock--landscape--client))
+
+<a id="nestedblock--landscape--client"></a>
+### Nested Schema for `landscape.client`
+
+Optional:
+
+- `account_name` (String) The account this computer belongs to.
+- `computer_title` (String) The title of this computer.
+- `data_path` (String) The directory to store data files in. Default: `/var/lib/land‐scape/client/.`
+- `http_proxy` (String) The URL of the HTTP proxy, if one is needed.
+- `https_proxy` (String) The URL of the HTTPS proxy, if one is needed.
+- `log_level` (String) The log level for the client. Default: `info`.
+- `ping_url` (String) The URL to perform lightweight exchange initiation with. Default: `https://landscape.canonical.com/ping`
+- `registration_key` (String) The account-wide key used for registering clients.
+- `tags` (String) Comma separated list of tag names to be sent to the server.
+- `url` (String) The Landscape server URL to connect to. Default: `https://landscape.canonical.com/message-system`.
+
+
+
+<a id="nestedblock--phone_home"></a>
+### Nested Schema for `phone_home`
+
+Optional:
+
+- `post` (List of String) A list of keys to post or all. Default: `all`.
+- `tries` (Number) The number of times to try sending the phone home data. Default: `10`.
+- `url` (String) The URL to send the phone home data to.
 
 
 <a id="nestedblock--power_state"></a>

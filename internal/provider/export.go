@@ -15,6 +15,36 @@ const (
 	hat = "#cloud-config"
 )
 
+func transformLandscape(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Landscape == nil {
+		return nil
+	}
+
+	config := ccmodules.LandscapeOutput{}
+
+	if model.Landscape.Client == nil {
+		return nil
+	}
+
+	client := ccmodules.ClientOutput{}
+
+	client.URL = model.Landscape.Client.URL.ValueString()
+	client.PingURL = model.Landscape.Client.PingURL.ValueString()
+	client.DataPath = model.Landscape.Client.DataPath.ValueString()
+	client.LogLevel = model.Landscape.Client.LogLevel.ValueString()
+	client.ComputerTitle = model.Landscape.Client.ComputerTitle.ValueString()
+	client.AccountName = model.Landscape.Client.AccountName.ValueString()
+	client.RegistrationKey = model.Landscape.Client.RegistrationKey.ValueString()
+	client.Tags = model.Landscape.Client.Tags.ValueString()
+	client.HTTPProxy = model.Landscape.Client.HTTPProxy.ValueString()
+	client.HTTPSProxy = model.Landscape.Client.HTTPSProxy.ValueString()
+
+	config.Client = &client
+	output.Landscape = &config
+
+	return nil
+}
+
 func transformSetHostname(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	output.Hostname = model.Hostname.ValueString()
 	output.FQDN = model.FQDN.ValueString()
@@ -761,6 +791,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformPhoneHome(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformLandscape(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

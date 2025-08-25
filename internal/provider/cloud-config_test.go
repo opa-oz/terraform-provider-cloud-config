@@ -203,6 +203,67 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 	}
 }
 
+func TestLandscapeModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+landscape {
+      client {
+          url= "https://landscape.canonical.com/message-system"
+          ping_url= "http://landscape.canonical.com/ping"
+          data_path= "/var/lib/landscape/client"
+          http_proxy= "http://my.proxy.com/foobar"
+          https_proxy= "https://my.proxy.com/foobar"
+          tags= "server,cloud"
+          computer_title= "footitle"
+          registration_key= "fookey"
+          account_name= "fooaccount"
+      }
+}
+      `,
+			expectedValues: map[string]string{
+				"landscape.client.url":              "https://landscape.canonical.com/message-system",
+				"landscape.client.ping_url":         "http://landscape.canonical.com/ping",
+				"landscape.client.data_path":        "/var/lib/landscape/client",
+				"landscape.client.http_proxy":       "http://my.proxy.com/foobar",
+				"landscape.client.https_proxy":      "https://my.proxy.com/foobar",
+				"landscape.client.tags":             "server,cloud",
+				"landscape.client.computer_title":   "footitle",
+				"landscape.client.registration_key": "fookey",
+				"landscape.client.account_name":     "fooaccount",
+			},
+			expectedOutput: `
+landscape:
+    client:
+        url: https://landscape.canonical.com/message-system
+        ping_url: http://landscape.canonical.com/ping
+        data_path: /var/lib/landscape/client
+        computer_title: footitle
+        account_name: fooaccount
+        registration_key: fookey
+        tags: server,cloud
+        http_proxy: http://my.proxy.com/foobar
+        https_proxy: https://my.proxy.com/foobar
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestSetHostnameModule(t *testing.T) {
 	testCases := []testCase{
 		{

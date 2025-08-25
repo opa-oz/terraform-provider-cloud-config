@@ -163,7 +163,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Install Hotplug     | **Full**            |                       |
 | Keyboard           | **Full**            |                       |
 | Keys to Console    | **Full**            |                       |
-| Landscape          | TBD            |                       |
+| Landscape          | **Full**            |                       |
 | Locale             | **Full**            |                       |
 | LXD                | TBD            |                       |
 | MCollective        | TBD            |                       |
