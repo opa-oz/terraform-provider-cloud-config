@@ -609,6 +609,36 @@ func transformPowerStateChange(_ context.Context, output *ExportModel, model Clo
 	return nil
 }
 
+func transformPhoneHome(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.PhoneHome == nil {
+		return nil
+	}
+
+	config := ccmodules.PhoneHomeOutput{}
+
+	config.URL = model.PhoneHome.URL.ValueString()
+	config.Tries = int(model.PhoneHome.Tries.ValueInt64())
+
+	if !model.PhoneHome.Post.IsUnknown() {
+		elems := model.PhoneHome.Post.Elements()
+
+		if len(elems) > 0 {
+			whens := make([]string, len(elems))
+			diagnostics := model.PhoneHome.Post.ElementsAs(ctx, &whens, false)
+
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+
+			config.Post = &whens
+		}
+	}
+
+	output.PhoneHome = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -726,6 +756,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformPowerStateChange(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformPhoneHome(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

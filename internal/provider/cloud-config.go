@@ -53,6 +53,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.SaltMinionModel
 	ccmodules.UbuntuAutoinstallModel
 	ccmodules.PowerStateModel
+	ccmodules.PhoneHomeModel
 }
 
 type ExportModel struct {
@@ -82,6 +83,7 @@ type ExportModel struct {
 	ccmodules.SaltMinionOutputModel                 `yaml:",inline"`
 	ccmodules.UbuntuAutoinstallOutputModel          `yaml:",inline"`
 	ccmodules.PowerStateOutputModel                 `yaml:",inline"`
+	ccmodules.PhoneHomeOutputModel                  `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -139,6 +141,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.SaltMinionBlock(),
 		ccmodules.UbuntuAutoinstallBlock(),
 		ccmodules.PowerStateChangeBlock(),
+		ccmodules.PhoneHomeBlock(),
 	}
 
 	for _, module := range block_modules {

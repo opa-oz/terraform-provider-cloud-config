@@ -141,8 +141,8 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 42%**
-`[█████████████——————————————]`
+**Progress: 43%**
+`[██████████████—————————————]`
 
 | Module             | Support        | Notes                |
 |--------------------|----------------|-----------------------|
@@ -170,7 +170,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Mounts             | TBD            |                       |
 | NTP                | TBD            |                       |
 | Package Update Upgrade Install| _Partial_            |    Attributes `apt` and `snap` aren't supported                  |
-| Phone Home          | TBD            |                       | 
+| Phone Home          | **Full**            |                       | 
 | Power State Change  | **Full**            |  Multiple workarounds are in place to reflect multi-type values of original    |
 | Puppet             | TBD            |                       |
 | Raspberry Pi Configuration| TBD            |                       |

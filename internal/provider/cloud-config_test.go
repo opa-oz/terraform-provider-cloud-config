@@ -1504,3 +1504,54 @@ power_state:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestPhoneHomeModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+phone_home {
+  url = "http://example.com/{{ v1.instance_id }}/"
+  tries = 5
+  post = ["pub_key_rsa", "pub_key_ecdsa", "pub_key_ed25519", "instance_id", "hostname", "fqdn"]
+}
+      `,
+			expectedValues: map[string]string{
+				"phone_home.url":    "http://example.com/{{ v1.instance_id }}/",
+				"phone_home.tries":  "5",
+				"phone_home.post.0": "pub_key_rsa",
+				"phone_home.post.1": "pub_key_ecdsa",
+				"phone_home.post.2": "pub_key_ed25519",
+				"phone_home.post.3": "instance_id",
+				"phone_home.post.4": "hostname",
+				"phone_home.post.5": "fqdn",
+			},
+			expectedOutput: `
+phone_home:
+    url: http://example.com/{{ v1.instance_id }}/
+    tries: 5
+    post:
+        - pub_key_rsa
+        - pub_key_ecdsa
+        - pub_key_ed25519
+        - instance_id
+        - hostname
+        - fqdn
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
