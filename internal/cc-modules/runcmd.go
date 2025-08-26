@@ -10,7 +10,7 @@ type RunCMDModule struct {
 }
 
 type RunCMDOutputModule struct {
-	RunCMD []string `yaml:"runcmd,omitempty"`
+	RunCMD *[]string `yaml:"runcmd,omitempty"`
 }
 
 // RunCMD

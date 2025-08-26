@@ -10,7 +10,7 @@ type BootCMDModule struct {
 }
 
 type BootCMDOutputModule struct {
-	BootCMD []string `yaml:"bootcmd,omitempty"`
+	BootCMD *[]string `yaml:"bootcmd,omitempty"`
 }
 
 // BootCMD

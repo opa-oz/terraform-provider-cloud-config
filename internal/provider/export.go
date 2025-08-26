@@ -38,7 +38,63 @@ func transformNTP(ctx context.Context, output *ExportModel, model CloudConfigRes
 		return nil
 	}
 
-	// ntp := ccmodules.NTPOutput{}
+	ntp := ccmodules.NTPOutput{}
+
+	if !model.NTP.Pools.IsUnknown() {
+		res, diagnostics := castArray[string](ctx, model.NTP.Pools)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		ntp.Pools = res
+	}
+
+	if !model.NTP.Servers.IsUnknown() {
+		res, diagnostics := castArray[string](ctx, model.NTP.Servers)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		ntp.Servers = res
+	}
+
+	if !model.NTP.Peers.IsUnknown() {
+		res, diagnostics := castArray[string](ctx, model.NTP.Peers)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		ntp.Peers = res
+	}
+
+	if !model.NTP.Allow.IsUnknown() {
+		res, diagnostics := castArray[string](ctx, model.NTP.Allow)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		ntp.Allow = res
+	}
+
+	ntp.NTPClient = model.NTP.NTPClient.ValueString()
+	ntp.Enabled = model.NTP.Enabled.ValueBoolPointer()
+
+	if model.NTP.Config != nil {
+		config := ccmodules.NTPConfigOutput{}
+
+		if !model.NTP.Config.Packages.IsUnknown() {
+			res, diagnostics := castArray[string](ctx, model.NTP.Config.Packages)
+			if diagnostics.HasError() {
+				return diagnostics
+			}
+			config.Packages = res
+		}
+
+		config.Confpath = model.NTP.Config.Confpath.ValueString()
+		config.CheckExe = model.NTP.Config.CheckExe.ValueString()
+		config.ServiceName = model.NTP.Config.ServiceName.ValueString()
+		config.Template = model.NTP.Config.Template.ValueString()
+
+		ntp.Config = &config
+	}
+
+	output.NTP = &ntp
 
 	return nil
 }
@@ -99,17 +155,6 @@ func transformLocale(_ context.Context, output *ExportModel, model CloudConfigRe
 
 func transformRunCMD(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if !model.RunCMD.IsUnknown() {
-		// elems := model.RunCMD.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	cmds := make([]string, len(elems))
-		// 	diagnostics := model.RunCMD.ElementsAs(ctx, &cmds, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		// 	output.RunCMD = cmds
-		// }
 		res, diagnostics := castArray[string](ctx, model.RunCMD)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -121,17 +166,6 @@ func transformRunCMD(ctx context.Context, output *ExportModel, model CloudConfig
 
 func transformBootCMD(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if !model.BootCMD.IsUnknown() {
-		// elems := model.BootCMD.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	cmds := make([]string, len(elems))
-		// 	diagnostics := model.BootCMD.ElementsAs(ctx, &cmds, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		// 	output.BootCMD = cmds
-		// }
 		res, diagnostics := castArray[string](ctx, model.BootCMD)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -153,17 +187,6 @@ func transformManageEtcHosts(_ context.Context, output *ExportModel, model Cloud
 
 func transformSSH(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if !model.SSHAuthorizedKeys.IsUnknown() {
-		// elems := model.SSHAuthorizedKeys.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	sshAuthKeys := make([]string, len(elems))
-		// 	diagnostics := model.SSHAuthorizedKeys.ElementsAs(ctx, &sshAuthKeys, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		// 	output.SSHAuthorizedKeys = sshAuthKeys
-		// }
 		res, diagnostics := castArray[string](ctx, model.SSHAuthorizedKeys)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -218,17 +241,6 @@ func transformPkgUpdateUpgrade(ctx context.Context, output *ExportModel, model C
 	output.PackageRebootIfRequired = model.PackageRebootIfRequired.ValueBool()
 
 	if !model.Packages.IsUnknown() {
-		// elems := model.Packages.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	cmds := make([]string, len(elems))
-		// 	diagnostics := model.Packages.ElementsAs(ctx, &cmds, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		// 	output.Packages = cmds
-		// }
 		res, diagnostics := castArray[string](ctx, model.Packages)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -272,17 +284,6 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 		}
 
 		if !user.Doas.IsUnknown() {
-			// elems := user.Doas.Elements()
-			//
-			// if len(elems) > 0 {
-			// 	cmds := make([]string, len(elems))
-			// 	diagnostics := user.Doas.ElementsAs(ctx, &cmds, false)
-			//
-			// 	if diagnostics.HasError() {
-			// 		return out, diagnostics
-			// 	}
-			// 	out.Doas = cmds
-			// }
 			res, diagnostics := castArray[string](ctx, user.Doas)
 			if diagnostics.HasError() {
 				return out, diagnostics
@@ -291,17 +292,6 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 		}
 
 		if !user.SSHAuthorizedKeys.IsUnknown() {
-			// elems := user.SSHAuthorizedKeys.Elements()
-			//
-			// if len(elems) > 0 {
-			// 	cmds := make([]string, len(elems))
-			// 	diagnostics := user.SSHAuthorizedKeys.ElementsAs(ctx, &cmds, false)
-			//
-			// 	if diagnostics.HasError() {
-			// 		return out, diagnostics
-			// 	}
-			// 	out.SSHAuthorizedKeys = cmds
-			// }
 			res, diagnostics := castArray[string](ctx, user.SSHAuthorizedKeys)
 			if diagnostics.HasError() {
 				return out, diagnostics
@@ -310,17 +300,6 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 		}
 
 		if !user.SSHImportId.IsUnknown() {
-			// elems := user.SSHImportId.Elements()
-			//
-			// if len(elems) > 0 {
-			// 	cmds := make([]string, len(elems))
-			// 	diagnostics := user.SSHImportId.ElementsAs(ctx, &cmds, false)
-			//
-			// 	if diagnostics.HasError() {
-			// 		return out, diagnostics
-			// 	}
-			// 	out.SSHImportId = cmds
-			// }
 			res, diagnostics := castArray[string](ctx, user.SSHImportId)
 			if diagnostics.HasError() {
 				return out, diagnostics
@@ -329,17 +308,6 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 		}
 
 		if !user.Sudo.IsUnknown() {
-			// elems := user.Sudo.Elements()
-			//
-			// if len(elems) > 0 {
-			// 	cmds := make([]string, len(elems))
-			// 	diagnostics := user.Sudo.ElementsAs(ctx, &cmds, false)
-			//
-			// 	if diagnostics.HasError() {
-			// 		return out, diagnostics
-			// 	}
-			// 	out.Sudo = cmds
-			// }
 			res, diagnostics := castArray[string](ctx, user.Sudo)
 			if diagnostics.HasError() {
 				return out, diagnostics
@@ -348,17 +316,6 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 		}
 
 		if !user.Groups.IsUnknown() {
-			// elems := user.Groups.Elements()
-			//
-			// if len(elems) > 0 {
-			// 	cmds := make([]string, len(elems))
-			// 	diagnostics := user.Groups.ElementsAs(ctx, &cmds, false)
-			//
-			// 	if diagnostics.HasError() {
-			// 		return out, diagnostics
-			// 	}
-			// 	out.Groups = cmds
-			// }
 			res, diagnostics := castArray[string](ctx, user.Groups)
 			if diagnostics.HasError() {
 				return out, diagnostics
@@ -370,17 +327,7 @@ func transformUsersAndGroups(ctx context.Context, output *ExportModel, model Clo
 	}
 
 	if !model.Groups.IsUnknown() {
-		// elems := model.Groups.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	cmds := make([]string, len(elems))
-		// 	diagnostics := model.Groups.ElementsAs(ctx, &cmds, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		// 	output.Groups = &cmds
-		// }
+		//}
 		res, diagnostics := castArray[string](ctx, model.Groups)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -472,18 +419,6 @@ func transformCACertificatesHosts(ctx context.Context, output *ExportModel, mode
 	caCerts.RemoveDefaults = model.CACerts.RemoveDefaults.ValueBool()
 
 	if !model.CACerts.Trusted.IsUnknown() {
-		// elems := model.CACerts.Trusted.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	certs := make([]string, len(elems))
-		// 	diagnostics := model.CACerts.Trusted.ElementsAs(ctx, &certs, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		//
-		// 	caCerts.Trusted = &certs
-		// }
 		res, diagnostics := castArray[string](ctx, model.CACerts.Trusted)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -523,18 +458,6 @@ func transformGrowpart(ctx context.Context, output *ExportModel, model CloudConf
 	growpart.Mode = model.Growpart.Mode.ValueString()
 
 	if !model.Growpart.Devices.IsUnknown() {
-		// elems := model.Growpart.Devices.Elements()
-		//
-		// if len(elems) > 0 {
-		// 	certs := make([]string, len(elems))
-		// 	diagnostics := model.Growpart.Devices.ElementsAs(ctx, &certs, false)
-		//
-		// 	if diagnostics.HasError() {
-		// 		return diagnostics
-		// 	}
-		//
-		// 	growpart.Devices = &certs
-		// }
 		res, diagnostics := castArray[string](ctx, model.Growpart.Devices)
 		if diagnostics.HasError() {
 			return diagnostics
@@ -898,6 +821,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformLandscape(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformNTP(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

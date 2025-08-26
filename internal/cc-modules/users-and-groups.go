@@ -39,31 +39,31 @@ type User struct {
 }
 
 type UserOutput struct {
-	Name              string   `yaml:"name,omitempty"`
-	Doas              []string `yaml:"doas,omitempty"`
-	ExpireDate        string   `yaml:"expiredate,omitempty"`
-	Gecos             string   `yaml:"gecos,omitempty"`
-	HomeDir           string   `yaml:"homedir,omitempty"`
-	Inactive          string   `yaml:"inactive,omitempty"`
-	LockPassword      *bool    `yaml:"lock_passwd,omitempty"`
-	NoCreateHome      bool     `yaml:"no_create_home,omitempty"`
-	NoLogInit         bool     `yaml:"no_log_init,omitempty"`
-	NoUserGroup       bool     `yaml:"no_user_group,omitempty"`
-	Passwd            string   `yaml:"passwd,omitempty"`
-	HashedPasswd      string   `yaml:"hashed_passwd,omitempty"`
-	PlainTextPasswd   string   `yaml:"plain_text_passwd,omitempty"`
-	CreateGroups      bool     `yaml:"create_groups,omitempty"`
-	PrimaryGroup      string   `yaml:"primary_group,omitempty"`
-	SELinuxUser       string   `yaml:"selinux_user,omitempty"`
-	Shell             string   `yaml:"shell,omitempty"`
-	SnapUser          string   `yaml:"snapuser,omitempty"`
-	SSHAuthorizedKeys []string `yaml:"ssh_authorized_keys,omitempty"`
-	SSHImportId       []string `yaml:"ssh_import_id,omitempty"`
-	SSHRedirectUser   bool     `yaml:"ssh_redirect_user,omitempty"`
-	System            bool     `yaml:"system,omitempty"`
-	UID               *int32   `yaml:"uid,omitempty"`
-	Sudo              []string `yaml:"sudo,omitempty"`
-	Groups            []string `yaml:"groups,omitempty"`
+	Name              string    `yaml:"name,omitempty"`
+	Doas              *[]string `yaml:"doas,omitempty"`
+	ExpireDate        string    `yaml:"expiredate,omitempty"`
+	Gecos             string    `yaml:"gecos,omitempty"`
+	HomeDir           string    `yaml:"homedir,omitempty"`
+	Inactive          string    `yaml:"inactive,omitempty"`
+	LockPassword      *bool     `yaml:"lock_passwd,omitempty"`
+	NoCreateHome      bool      `yaml:"no_create_home,omitempty"`
+	NoLogInit         bool      `yaml:"no_log_init,omitempty"`
+	NoUserGroup       bool      `yaml:"no_user_group,omitempty"`
+	Passwd            string    `yaml:"passwd,omitempty"`
+	HashedPasswd      string    `yaml:"hashed_passwd,omitempty"`
+	PlainTextPasswd   string    `yaml:"plain_text_passwd,omitempty"`
+	CreateGroups      bool      `yaml:"create_groups,omitempty"`
+	PrimaryGroup      string    `yaml:"primary_group,omitempty"`
+	SELinuxUser       string    `yaml:"selinux_user,omitempty"`
+	Shell             string    `yaml:"shell,omitempty"`
+	SnapUser          string    `yaml:"snapuser,omitempty"`
+	SSHAuthorizedKeys *[]string `yaml:"ssh_authorized_keys,omitempty"`
+	SSHImportId       *[]string `yaml:"ssh_import_id,omitempty"`
+	SSHRedirectUser   bool      `yaml:"ssh_redirect_user,omitempty"`
+	System            bool      `yaml:"system,omitempty"`
+	UID               *int32    `yaml:"uid,omitempty"`
+	Sudo              *[]string `yaml:"sudo,omitempty"`
+	Groups            *[]string `yaml:"groups,omitempty"`
 }
 
 type UsersAndGroupsModel struct {

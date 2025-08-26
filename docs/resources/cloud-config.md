@@ -107,6 +107,15 @@ If tags is defined, its contents should be a string delimited with a comma (“,
 - `locale_configfile` (String) The file in which to write the locale configuration (defaults to the distro’s default location).
 - `manage_etc_hosts` (Boolean) Whether to manage `/etc/hosts` on the system. If true, render the hosts file using `/etc/cloud/templates/hosts.tmpl` replacing `$hostname` and `$fdqn`.
 - `manage_etc_hosts_localhost` (Boolean) Append a 127.0.1.1 entry that resolves from FQDN and hostname every boot.
+- `ntp` (Block, Optional) Handle Network Time Protocol (NTP) configuration. If ntp is not installed on the system and NTP configuration is specified, ntp will be installed.
+
+If there is a default NTP config file in the image or one is present in the distro’s ntp package, it will be copied to a file with .dist appended to the filename before any changes are made.
+
+A list of NTP pools and NTP servers can be provided under the ntp config key.
+
+If no NTP servers or pools are provided, 4 pools will be used in the format:
+
+{0-3}.{distro}.pool.ntp.org (see [below for nested schema](#nestedblock--ntp))
 - `package_reboot_if_required` (Boolean) Set `true` to reboot the system if required by presence of `/var/run/reboot-required`. Default: `false`.
 - `package_update` (Boolean) Set `true` to update packages. Happens before upgrade or install. Default: `false`.
 - `package_upgrade` (Boolean) Set `true` to upgrade packages. Happens before install. Default: `false`.
@@ -319,6 +328,32 @@ Optional:
 - `registration_key` (String) The account-wide key used for registering clients.
 - `tags` (String) Comma separated list of tag names to be sent to the server.
 - `url` (String) The Landscape server URL to connect to. Default: `https://landscape.canonical.com/message-system`.
+
+
+
+<a id="nestedblock--ntp"></a>
+### Nested Schema for `ntp`
+
+Optional:
+
+- `allow` (List of String) List of CIDRs to allow.
+- `config` (Block, Optional) (see [below for nested schema](#nestedblock--ntp--config))
+- `enabled` (Boolean) Attempt to enable ntp clients if set to True. If set to false, ntp client will not be configured or installed.
+- `ntp_client` (String) Name of an NTP client to use to configure system NTP. When unprovided or ‘auto’ the default client preferred by the distribution will be used. The following built-in client names can be used to override existing configuration defaults: chrony, ntp, openntpd, ntpdate, systemd-timesyncd.
+- `peers` (List of String) List of ntp peers.
+- `pools` (List of String) List of ntp pools. If both pools and servers are empty, 4 default pool servers will be provided of the format `{0-3}.{distro}.pool.ntp.org`. NOTE: for Alpine Linux when using the Busybox NTP client this setting will be ignored due to the limited functionality of Busybox’s ntpd.
+- `servers` (List of String) List of ntp servers. If both pools and servers are empty, 4 default pool servers will be provided with the format `{0-3}.{distro}.pool.ntp.org`.
+
+<a id="nestedblock--ntp--config"></a>
+### Nested Schema for `ntp.config`
+
+Optional:
+
+- `check_exe` (String) The executable name for the `ntp_client`. For example, ntp service `check_exe` is ‘ntpd’ because it runs the ntpd binary.
+- `confpath` (String) Configuration settings or overrides for the ntp_client specified.
+- `packages` (List of String) List of packages needed to be installed for the selected **ntp_client**.
+- `service_name` (String) The systemd or sysvinit service name used to start and stop the ntp_client service.
+- `template` (String) Inline template allowing users to customize their ntp_client configuration with the use of the Jinja templating engine. The template content should start with `## template:jinja`. Within the template, you can utilize any of the following ntp module config keys: servers, pools, allow, and peers. Each cc_ntp schema config key and expected value type is defined above.
 
 
 

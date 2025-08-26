@@ -203,6 +203,89 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 	}
 }
 
+func TestNTPModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+ntp {
+  enabled= true
+  ntp_client= "myntpclient"
+  pools= ["0.int.pool.ntp.org", "1.int.pool.ntp.org", "ntp.myorg.org"]
+  servers= [
+   "ntp.server.local",
+   "ntp.ubuntu.com",
+   "192.168.23.2"
+  ]
+  allow=  [ "192.168.23.0/32" ]
+  peers=  [ "km001",  "km002" ]
+
+      config {
+        confpath= "/etc/myntpclient/myntpclient.conf"
+        check_exe= "myntpclientd"
+        packages=  [ "myntpclient" ]
+        service_name= "myntpclient"
+        template= "template"
+      }
+}
+      `,
+			expectedValues: map[string]string{
+				"ntp.enabled":    "true",
+				"ntp.ntp_client": "myntpclient",
+				"ntp.pools.0":    "0.int.pool.ntp.org",
+				"ntp.pools.1":    "1.int.pool.ntp.org",
+				"ntp.pools.2":    "ntp.myorg.org",
+				"ntp.servers.0":  "ntp.server.local",
+				"ntp.servers.1":  "ntp.ubuntu.com",
+				"ntp.servers.2":  "192.168.23.2",
+				"ntp.allow.0":    "192.168.23.0/32",
+				"ntp.peers.0":    "km001",
+				"ntp.peers.1":    "km002",
+			},
+			expectedOutput: `
+ntp:
+    pools:
+        - 0.int.pool.ntp.org
+        - 1.int.pool.ntp.org
+        - ntp.myorg.org
+    servers:
+        - ntp.server.local
+        - ntp.ubuntu.com
+        - 192.168.23.2
+    peers:
+        - km001
+        - km002
+    allow:
+        - 192.168.23.0/32
+    ntp_client: myntpclient
+    enabled: true
+    config:
+        confpath: /etc/myntpclient/myntpclient.conf
+        check_exe: myntpclientd
+        packages:
+            - myntpclient
+        service_name: myntpclient
+        template: template
+
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestLandscapeModule(t *testing.T) {
 	testCases := []testCase{
 		{

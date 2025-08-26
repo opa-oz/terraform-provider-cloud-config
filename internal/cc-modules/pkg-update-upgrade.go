@@ -18,7 +18,7 @@ type PkgUpdateUpgradeOutputModel struct {
 	PackageUpgrade          bool `yaml:"package_upgrade,omitempty"`
 	PackageRebootIfRequired bool `yaml:"package_reboot_if_required,omitempty"`
 
-	Packages []string `yaml:"packages,omitempty"`
+	Packages *[]string `yaml:"packages,omitempty"`
 }
 
 // PkgUpdateUpgrade
