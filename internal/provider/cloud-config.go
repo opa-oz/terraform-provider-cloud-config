@@ -56,6 +56,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.PhoneHomeModel
 	ccmodules.LandscapeModel
 	ccmodules.NTPModel
+	ccmodules.RPIModel
 }
 
 type ExportModel struct {
@@ -88,6 +89,7 @@ type ExportModel struct {
 	ccmodules.PhoneHomeOutputModel                  `yaml:",inline"`
 	ccmodules.LandscapeOutputModel                  `yaml:",inline"`
 	ccmodules.NTPOutputModel                        `yaml:",inline"`
+	ccmodules.RPIOutputModel                        `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -148,6 +150,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.PhoneHomeBlock(),
 		ccmodules.LandscapeBlock(),
 		ccmodules.NTPBlock(),
+		ccmodules.RPIBlock(),
 	}
 
 	for _, module := range block_modules {

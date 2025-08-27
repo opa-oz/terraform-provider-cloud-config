@@ -33,6 +33,41 @@ func castArray[T any](ctx context.Context, arr types.List) (*[]T, diag.Diagnosti
 	return nil, nil
 }
 
+func transformRPI(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.RPI == nil {
+		return nil
+	}
+
+	rpi := ccmodules.RPIOutput{}
+
+	rpi.EnableRPIConnect = model.RPI.EnableRPIConnect.ValueBool()
+
+	if model.RPI.Interfaces != nil {
+		interfaces := ccmodules.RPIInterfaceOutput{}
+
+		interfaces.SPI = model.RPI.Interfaces.SPI.ValueBool()
+		interfaces.I2C = model.RPI.Interfaces.I2C.ValueBool()
+		interfaces.SSH = model.RPI.Interfaces.SSH.ValueBool()
+		interfaces.Onewire = model.RPI.Interfaces.Onewire.ValueBool()
+		interfaces.RemoteGPIO = model.RPI.Interfaces.RemoteGPIO.ValueBool()
+
+		if model.RPI.Interfaces.Serial != nil {
+			serial := ccmodules.RPISerialOutput{}
+
+			serial.Console = model.RPI.Interfaces.Serial.Console.ValueBool()
+			serial.Hardware = model.RPI.Interfaces.Serial.Hardware.ValueBool()
+
+			interfaces.Serial = &serial
+		}
+
+		rpi.Interfaces = &interfaces
+	}
+
+	output.RPI = &rpi
+
+	return nil
+}
+
 func transformNTP(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if model.NTP == nil {
 		return nil
@@ -826,6 +861,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformNTP(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformRPI(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

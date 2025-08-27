@@ -203,6 +203,70 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 	}
 }
 
+func TestRPIModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+rpi {
+      enable_rpi_connect = true
+
+      interfaces {
+        spi = true
+        i2c = true
+        ssh = true
+        onewire = true
+        remote_gpio = true
+
+        serial {
+          console = true
+          hardware = true
+        }
+
+      }
+}
+      `,
+			expectedValues: map[string]string{
+				"rpi.enable_rpi_connect":         "true",
+				"rpi.interfaces.spi":             "true",
+				"rpi.interfaces.i2c":             "true",
+				"rpi.interfaces.ssh":             "true",
+				"rpi.interfaces.onewire":         "true",
+				"rpi.interfaces.remote_gpio":     "true",
+				"rpi.interfaces.serial.console":  "true",
+				"rpi.interfaces.serial.hardware": "true",
+			},
+			expectedOutput: `
+rpi:
+    interfaces:
+        spi: true
+        i2c: true
+        ssh: true
+        serial:
+            console: true
+            hardware: true
+        onewire: true
+        remote_gpio: true
+    enable_rpi_connect: true
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestNTPModule(t *testing.T) {
 	testCases := []testCase{
 		{

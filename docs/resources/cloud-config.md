@@ -152,6 +152,11 @@ This module can be disabled altogether by setting resize_rootfs to false.
 
 Default: true
 - `resize_rootfs_no_block` (Boolean) Optionally, the resize operation can be performed in the background while cloud-init continues running modules. This can be enabled by setting resize_rootfs to noblock.
+- `rpi` (Block, Optional) This module handles ARM interface configuration for Raspberry Pi.
+
+It also handles Raspberry Pi Connect installation and enablement. Raspberry Pi Connect service will be installed and enabled to auto start on boot.
+
+This only works on Raspberry Pi OS (bookworm and later). (see [below for nested schema](#nestedblock--rpi))
 - `runcmd` (List of String) Run arbitrary commands at a rc.local-like time-frame with output to the console. Each item will be interpreted by `sh`.
 - `salt_minion` (Block, Optional) This module installs, configures and starts Salt Minion. If the salt_minion key is present in the config parts, then Salt Minion will be installed and started.
 
@@ -379,6 +384,37 @@ Optional:
 - `mode` (String) Must be one of poweroff, halt, or reboot.
 - `no_delay` (Boolean) Apply changes right after cloud-init finish. Same as `delay: now`. Default `true`
 - `timeout` (Number) Time in seconds to wait for the cloud-init process to finish before executing shutdown. Default: `30`.
+
+
+<a id="nestedblock--rpi"></a>
+### Nested Schema for `rpi`
+
+Optional:
+
+- `enable_rpi_connect` (Boolean) Install and enable Raspberry Pi Connect. Default: `false`.
+- `interfaces` (Block, Optional) (see [below for nested schema](#nestedblock--rpi--interfaces))
+
+<a id="nestedblock--rpi--interfaces"></a>
+### Nested Schema for `rpi.interfaces`
+
+Optional:
+
+- `i2c` (Boolean) Enable I2C interface. Default: `false`.
+- `onewire` (Boolean) Enable 1-Wire interface. Default: `false`.
+- `remote_gpio` (Boolean) Enable remote GPIO interface. Default: `false`.
+- `serial` (Block, Optional) (see [below for nested schema](#nestedblock--rpi--interfaces--serial))
+- `spi` (Boolean) Enable SPI interface. Default: `false`.
+- `ssh` (Boolean) **NOTE** This is not in `cloud-init` documentation, but in examples. Just for compatibility sake let it be here. Default: `false`.
+
+<a id="nestedblock--rpi--interfaces--serial"></a>
+### Nested Schema for `rpi.interfaces.serial`
+
+Optional:
+
+- `console` (Boolean) Enable serial console. Default: `false`.
+- `hardware` (Boolean) Enable UART hardware. Default: `false`.
+
+
 
 
 <a id="nestedblock--salt_minion"></a>

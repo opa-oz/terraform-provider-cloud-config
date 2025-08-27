@@ -141,8 +141,8 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 43%**
-`[██████████████—————————————]`
+**Progress: 46%**
+`[███████████████————————————]`
 
 | Module             | Support        | Notes                |
 |--------------------|----------------|-----------------------|
@@ -168,12 +168,12 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | LXD                | TBD            |                       |
 | MCollective        | TBD            |                       |
 | Mounts             | TBD            |                       |
-| NTP                | TBD            |                       |
+| NTP                | **Full**            |                       |
 | Package Update Upgrade Install| _Partial_            |    Attributes `apt` and `snap` aren't supported                  |
 | Phone Home          | **Full**            |                       | 
 | Power State Change  | **Full**            |  Multiple workarounds are in place to reflect multi-type values of original    |
 | Puppet             | TBD            |                       |
-| Raspberry Pi Configuration| TBD            |                       |
+| Raspberry Pi Configuration| **Full**            | `serial` can be `false`, but it's `false` by default, so it's not explicitly implementd               |
 | Resizefs           | **Full**            |                       |
 | Resolv Conf        | TBD            |                       |
 | Red Hat Subscription| TBD            |                       |
