@@ -185,7 +185,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Scripts Per Once   | **Full**            |  This module actually doesn't have any configuration   |
 | Scripts User       | **Full**            |  This module actually doesn't have any configuration   |
 | Scripts Vendor     | TBD            |                       |
-| Seed Random        | TBD            |                       |
+| Seed Random        | **Full**            |                       |
 | Set Hostname        | **Full**            |                       |
 | Set Passwords      | _Partial_            |    Mostly supported, lacking validation                   |
 | Snap               | TBD            |                       |

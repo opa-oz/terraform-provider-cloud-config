@@ -57,6 +57,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.LandscapeModel
 	ccmodules.NTPModel
 	ccmodules.RPIModel
+	ccmodules.SeedRandomModel
 }
 
 type ExportModel struct {
@@ -90,6 +91,7 @@ type ExportModel struct {
 	ccmodules.LandscapeOutputModel                  `yaml:",inline"`
 	ccmodules.NTPOutputModel                        `yaml:",inline"`
 	ccmodules.RPIOutputModel                        `yaml:",inline"`
+	ccmodules.SeedRandomOutputModel                 `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -151,6 +153,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.LandscapeBlock(),
 		ccmodules.NTPBlock(),
 		ccmodules.RPIBlock(),
+		ccmodules.SeedRandomBlock(),
 	}
 
 	for _, module := range block_modules {

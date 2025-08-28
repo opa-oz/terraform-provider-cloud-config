@@ -144,6 +144,11 @@ If you delay 5 (5 minutes) and have a timeout of 120 (2 minutes), the max time u
 With Alpine Linux any message value specified is ignored as Alpine’s halt, poweroff, and reboot commands do not support broadcasting a message. (see [below for nested schema](#nestedblock--power_state))
 - `prefer_fqdn_over_hostname` (Boolean) If true, the fqdn will be used if it is set. If false, the hostname will be used. If unset, the result is distro-dependent.
 - `preserve_hostname` (Boolean) If true, the hostname will not be changed. Default: `false`.
+- `random_seed` (Block, Optional) All cloud instances started from the same image will produce similar data when they are first booted as they are all starting with the same seed for the kernel’s entropy keyring. To avoid this, random seed data can be provided to the instance, either as a string or by specifying a command to run to generate the data.
+
+Configuration for this module is under the random_seed config key. If the cloud provides its own random seed data, it will be appended to data before it is written to file.
+
+If the command key is specified, the given command will be executed. This will happen after file has been populated. That command’s environment will contain the value of the file key as RANDOM_SEED_FILE. If a command is specified that cannot be run, no error will be reported unless command_required is set to true. (see [below for nested schema](#nestedblock--random_seed))
 - `resize_rootfs` (Boolean) Resize a filesystem to use all available space on partition. This module is useful along with cc_growpart and will ensure that if the root partition has been resized, the root filesystem will be resized along with it.
 
 By default, cc_resizefs will resize the root partition and will block the boot process while the resize command is running.
@@ -384,6 +389,18 @@ Optional:
 - `mode` (String) Must be one of poweroff, halt, or reboot.
 - `no_delay` (Boolean) Apply changes right after cloud-init finish. Same as `delay: now`. Default `true`
 - `timeout` (Number) Time in seconds to wait for the cloud-init process to finish before executing shutdown. Default: `30`.
+
+
+<a id="nestedblock--random_seed"></a>
+### Nested Schema for `random_seed`
+
+Optional:
+
+- `command` (List of String) Execute this command to seed random. The command will have RANDOM_SEED_FILE in its environment set to the value of file above.
+- `command_required` (Boolean) If true, and command is not available to be run then an exception is raised and cloud-init will record failure. Otherwise, only debug error is mentioned. Default: `false`.
+- `data` (String) This data will be written to file before data from the datasource. When using a multi-line value or specifying binary data, be sure to follow YAML syntax and use the | and `!binary` YAML format specifiers when appropriate.
+- `encoding` (String) Used to decode data provided. Allowed values are `raw`, `base64`, `b64`, `gzip`, or `gz`. Default: `raw`.
+- `file` (String) File to write random data to. Default: `/dev/urandom`.
 
 
 <a id="nestedblock--rpi"></a>

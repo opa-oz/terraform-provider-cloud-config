@@ -33,7 +33,7 @@ func castArray[T any](ctx context.Context, arr types.List) (*[]T, diag.Diagnosti
 	return nil, nil
 }
 
-func transformRPI(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+func transformRPI(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if model.RPI == nil {
 		return nil
 	}
@@ -64,6 +64,32 @@ func transformRPI(ctx context.Context, output *ExportModel, model CloudConfigRes
 	}
 
 	output.RPI = &rpi
+
+	return nil
+}
+
+func transformSeedRandom(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.RandomSeed == nil {
+		return nil
+	}
+
+	seed := ccmodules.RandomSeedOutput{}
+
+	if !model.RandomSeed.Command.IsUnknown() {
+		res, diagnostics := castArray[string](ctx, model.RandomSeed.Command)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		seed.Command = res
+	}
+
+	seed.File = model.RandomSeed.File.ValueString()
+	seed.Data = model.RandomSeed.Data.ValueString()
+	seed.Encoding = model.RandomSeed.Encoding.ValueString()
+
+	seed.CommandRequired = model.RandomSeed.CommandRequired.ValueBool()
+
+	output.RandomSeed = &seed
 
 	return nil
 }
@@ -866,6 +892,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformRPI(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformSeedRandom(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

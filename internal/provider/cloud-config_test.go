@@ -203,6 +203,57 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 	}
 }
 
+func TestSeedRandomModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+random_seed {
+      file = "/dev/urandom"
+      data = "my random string"
+      encoding = "raw"
+      command_required = true
+      command = ["sh", "-c", "dd if=/dev/urandom of=$RANDOM_SEED_FILE"]
+}
+      `,
+			expectedValues: map[string]string{
+				"random_seed.file":             "/dev/urandom",
+				"random_seed.data":             "my random string",
+				"random_seed.encoding":         "raw",
+				"random_seed.command_required": "true",
+				"random_seed.command.0":        "sh",
+				"random_seed.command.1":        "-c",
+				"random_seed.command.2":        "dd if=/dev/urandom of=$RANDOM_SEED_FILE",
+			},
+			expectedOutput: `
+random_seed:
+    file: /dev/urandom
+    data: my random string
+    encoding: raw
+    command:
+        - sh
+        - -c
+        - dd if=/dev/urandom of=$RANDOM_SEED_FILE
+    command_required: true
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestRPIModule(t *testing.T) {
 	testCases := []testCase{
 		{
