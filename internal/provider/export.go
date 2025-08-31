@@ -33,6 +33,43 @@ func castArray[T any](ctx context.Context, arr types.List) (*[]T, diag.Diagnosti
 	return nil, nil
 }
 
+func transformWireguard(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Wireguard == nil {
+		return nil
+	}
+
+	wireguard := ccmodules.WireguardOutput{}
+
+	if !model.Wireguard.ReadinessProbe.IsUnknown() {
+		res, diagnostics := castArray[string](ctx, model.Wireguard.ReadinessProbe)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		wireguard.ReadinessProbe = res
+	}
+
+	if !model.Wireguard.Interfaces.IsUnknown() {
+		res, diagnostics := castArray[ccmodules.Interface](ctx, model.Wireguard.Interfaces)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+		interfaces := make([]ccmodules.InterfaceOutput, len(*res))
+		for k, v := range *res {
+			interfaces[k] = ccmodules.InterfaceOutput{
+				Name:       v.Name.ValueString(),
+				ConfigPath: v.ConfigPath.ValueString(),
+				Content:    v.Content.ValueString(),
+			}
+		}
+
+		wireguard.Interfaces = &interfaces
+	}
+
+	output.Wireguard = &wireguard
+
+	return nil
+}
+
 func transformRPI(_ context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if model.RPI == nil {
 		return nil
@@ -897,6 +934,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformSeedRandom(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformWireguard(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

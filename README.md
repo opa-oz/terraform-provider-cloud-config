@@ -141,7 +141,7 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 46%**
+**Progress: 47%**
 `[███████████████————————————]`
 
 | Module             | Support        | Notes                |
@@ -200,7 +200,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Update Etc Hosts  | **Full**            |      Supported as two fields, because in original it's `true/false/'localhost'`                 |
 | Update Hostname    | TBD            |                       |
 | Users and Groups   | _Partial_            |     No support for deprecated fields, no support for nested `groups` object                  |
-| Wireguard          | TBD            |                       |
+| Wireguard          | **Full**            |                       |
 | Write Files        | TBD            |                       |
 | Yum Add Repo       | TBD            |                       |
 | Zypper Add Repo    | TBD            |                       |

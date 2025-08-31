@@ -203,6 +203,58 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 	}
 }
 
+func TestWireguardModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+wireguard {
+      readinessprobe = ["systemctl restart service", "curl https://webhook.endpoint/example", "nc -zv some-service-fqdn 443"] 
+
+      interfaces {
+         name = "wg01"
+         config_path = "/etc/wireguard/wg0.conf"
+        content = "[Interface]"
+      }
+}
+      `,
+			expectedValues: map[string]string{
+				"wireguard.readinessprobe.0":         "systemctl restart service",
+				"wireguard.readinessprobe.1":         "curl https://webhook.endpoint/example",
+				"wireguard.readinessprobe.2":         "nc -zv some-service-fqdn 443",
+				"wireguard.interfaces.0.name":        "wg01",
+				"wireguard.interfaces.0.config_path": "/etc/wireguard/wg0.conf",
+				"wireguard.interfaces.0.content":     "[Interface]",
+			},
+			expectedOutput: `
+wireguard:
+    interfaces:
+        - name: wg01
+          config_path: /etc/wireguard/wg0.conf
+          content: '[Interface]'
+    readinessprobe:
+        - systemctl restart service
+        - curl https://webhook.endpoint/example
+        - nc -zv some-service-fqdn 443
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestSeedRandomModule(t *testing.T) {
 	testCases := []testCase{
 		{

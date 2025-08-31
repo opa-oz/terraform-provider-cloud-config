@@ -193,6 +193,22 @@ Udev rules are installed while cloud-init is running, which means that devices w
 Currently supported datasources: **Openstack, EC2** (see [below for nested schema](#nestedblock--updates))
 - `user` (Block, Optional) The user dictionary values override the `default_user` configuration from `/etc/cloud/cloud.cfg`. The user dictionary keys supported for the `default_user` are the same as the users schema. (see [below for nested schema](#nestedblock--user))
 - `users` (Block List) List of users (see [below for nested schema](#nestedblock--users))
+- `wireguard` (Block, Optional) The WireGuard module provides a dynamic interface for configuring WireGuard (as a peer or server) in a straightforward way.
+
+This module takes care of:
+ - writing interface configuration files
+ - enabling and starting interfaces
+ - installing wireguard-tools package
+ - loading WireGuard kernel module
+ - executing readiness probes
+
+**What is a readiness probe?**
+The idea behind readiness probes is to ensure WireGuard connectivity before continuing the cloud-init process. This could be useful if you need access to specific services like an internal APT Repository Server (e.g., Landscape) to install/update packages.
+
+**Example**
+An edge device can’t access the internet but uses cloud-init modules which will install packages (e.g. landscape, packages, ubuntu_advantage). Those modules will fail due to missing internet connection. The wireguard module fixes that problem as it waits until all readiness probes (which can be arbitrary commands, e.g. checking if a proxy server is reachable over WireGuard network) are finished, before continuing the cloud-init config stage.
+
+>In order to use DNS with WireGuard you have to install the resolvconf package or symlink it to systemd’s resolvectl, otherwise wg-quick commands will throw an error message that executable resolvconf is missing, which leads the wireguard module to fail. (see [below for nested schema](#nestedblock--wireguard))
 
 ### Read-Only
 
@@ -533,3 +549,21 @@ Optional:
 - `sudo` (List of String) Changed in version 22.2.The value ``false`` is deprecated for this key, use ``null`` instead.
 - `system` (Boolean) Create user as system user with no home directory. Default: `false`.
 - `uid` (Number) The user’s ID. Default value [system default].
+
+
+<a id="nestedblock--wireguard"></a>
+### Nested Schema for `wireguard`
+
+Optional:
+
+- `interfaces` (Block List) (see [below for nested schema](#nestedblock--wireguard--interfaces))
+- `readinessprobe` (List of String) List of shell commands to be executed as probes.
+
+<a id="nestedblock--wireguard--interfaces"></a>
+### Nested Schema for `wireguard.interfaces`
+
+Optional:
+
+- `config_path` (String) Path to configuration file of Wireguard interface.
+- `content` (String) Wireguard interface configuration. Contains key, peer, …
+- `name` (String) Name of the interface. Typically wgx (example: wg0).
