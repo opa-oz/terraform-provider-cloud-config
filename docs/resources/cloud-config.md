@@ -209,6 +209,13 @@ The idea behind readiness probes is to ensure WireGuard connectivity before cont
 An edge device can’t access the internet but uses cloud-init modules which will install packages (e.g. landscape, packages, ubuntu_advantage). Those modules will fail due to missing internet connection. The wireguard module fixes that problem as it waits until all readiness probes (which can be arbitrary commands, e.g. checking if a proxy server is reachable over WireGuard network) are finished, before continuing the cloud-init config stage.
 
 >In order to use DNS with WireGuard you have to install the resolvconf package or symlink it to systemd’s resolvectl, otherwise wg-quick commands will throw an error message that executable resolvconf is missing, which leads the wireguard module to fail. (see [below for nested schema](#nestedblock--wireguard))
+- `zypper` (Block, Optional) Zypper behavior can be configured using the config key, which will modify /etc/zypp/zypp.conf. The configuration writer will only append the provided configuration options to the configuration file. Any duplicate options will be resolved by the way the zypp.conf INI file is parsed.
+
+> Setting configdir is not supported and will be skipped.
+
+The repos key may be used to add repositories to the system. Beyond the required id and baseurl attributions, no validation is performed on the repos entries.
+
+It is assumed the user is familiar with the Zypper repository file format. This configuration is also applicable for systems with transactional-updates. (see [below for nested schema](#nestedblock--zypper))
 
 ### Read-Only
 
@@ -567,3 +574,21 @@ Optional:
 - `config_path` (String) Path to configuration file of Wireguard interface.
 - `content` (String) Wireguard interface configuration. Contains key, peer, …
 - `name` (String) Name of the interface. Typically wgx (example: wg0).
+
+
+
+<a id="nestedblock--zypper"></a>
+### Nested Schema for `zypper`
+
+Optional:
+
+- `config` (Map of String) Any supported zypo.conf key is written to `/etc/zypp/zypp.conf`.
+- `repos` (Block List) (see [below for nested schema](#nestedblock--zypper--repos))
+
+<a id="nestedblock--zypper--repos"></a>
+### Nested Schema for `zypper.repos`
+
+Optional:
+
+- `baseurl` (String) The base repositoy URL.
+- `id` (String) The unique id of the repo, used when writing `/etc/zypp/repos.d/<id>.repo`.

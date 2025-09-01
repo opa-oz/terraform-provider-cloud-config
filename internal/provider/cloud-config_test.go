@@ -203,6 +203,67 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 	}
 }
 
+func TestZypperModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+zypper {
+      config = {
+        "download.use_deltarpm": "true", 
+        "reposdir": "/etc/zypp/repos.dir", 
+        "servicesdir": "/etc/zypp/services.d"
+      }
+
+      repos {
+        baseurl = "http://dl.opensuse.org/dist/leap/v/update"
+        id = "opensuse-oss-update"
+      }
+
+      repos {
+        baseurl = "http://dl.opensuse.org/dist/leap/v/repo/oss/"
+        id = "opensuse-oss"
+      }
+}
+      `,
+			expectedValues: map[string]string{
+				"zypper.config.reposdir":    "/etc/zypp/repos.dir",
+				"zypper.config.servicesdir": "/etc/zypp/services.d",
+				"zypper.repos.0.id":         "opensuse-oss-update",
+				"zypper.repos.0.baseurl":    "http://dl.opensuse.org/dist/leap/v/update",
+				"zypper.repos.1.id":         "opensuse-oss",
+				"zypper.repos.1.baseurl":    "http://dl.opensuse.org/dist/leap/v/repo/oss/",
+			},
+			expectedOutput: `
+zypper:
+    repos:
+        - id: opensuse-oss-update
+          baseurl: http://dl.opensuse.org/dist/leap/v/update
+        - id: opensuse-oss
+          baseurl: http://dl.opensuse.org/dist/leap/v/repo/oss/
+    config:
+        download.use_deltarpm: "true"
+        reposdir: /etc/zypp/repos.dir
+        servicesdir: /etc/zypp/services.d
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}
+
 func TestWireguardModule(t *testing.T) {
 	testCases := []testCase{
 		{

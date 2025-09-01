@@ -203,7 +203,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Wireguard          | **Full**            |                       |
 | Write Files        | TBD            |                       |
 | Yum Add Repo       | TBD            |                       |
-| Zypper Add Repo    | TBD            |                       |
+| Zypper Add Repo    | **Full**            |   Module example has undocumented properties, these aren't supported      |
 
 ----
 

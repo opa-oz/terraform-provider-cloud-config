@@ -59,6 +59,7 @@ type CloudConfigResourceModel struct {
 	ccmodules.RPIModel
 	ccmodules.SeedRandomModel
 	ccmodules.WireguardModel
+	ccmodules.ZypperModel
 }
 
 type ExportModel struct {
@@ -94,6 +95,7 @@ type ExportModel struct {
 	ccmodules.RPIOutputModel                        `yaml:",inline"`
 	ccmodules.SeedRandomOutputModel                 `yaml:",inline"`
 	ccmodules.WireguardOutputModel                  `yaml:",inline"`
+	ccmodules.ZypperOutputModel                     `yaml:",inline"`
 }
 
 func (r *CloudConfigResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -157,6 +159,7 @@ func (r *CloudConfigResource) Schema(ctx context.Context, _ resource.SchemaReque
 		ccmodules.RPIBlock(),
 		ccmodules.SeedRandomBlock(),
 		ccmodules.WireguardBlock(),
+		ccmodules.ZypperBlock(),
 	}
 
 	for _, module := range block_modules {

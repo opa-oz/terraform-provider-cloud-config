@@ -33,6 +33,47 @@ func castArray[T any](ctx context.Context, arr types.List) (*[]T, diag.Diagnosti
 	return nil, nil
 }
 
+func transformZypper(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Zypper == nil {
+		return nil
+	}
+
+	zypper := ccmodules.ZypperOutput{}
+
+	if !model.Zypper.Repos.IsUnknown() {
+		res, diagnostics := castArray[ccmodules.ZypperRepository](ctx, model.Zypper.Repos)
+
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+
+		repos := make([]ccmodules.ZypperRepositoryOutput, len(*res))
+		for k, v := range *res {
+			repos[k] = ccmodules.ZypperRepositoryOutput{
+				ID:      v.ID.ValueString(),
+				BaseURL: v.BaseURL.ValueString(),
+			}
+		}
+
+		zypper.Repos = &repos
+	}
+
+	if !model.Zypper.Config.IsUnknown() {
+		config := make(map[string]string)
+
+		diagnostics := model.Zypper.Config.ElementsAs(ctx, &config, false)
+		if diagnostics.HasError() {
+			return diagnostics
+		}
+
+		zypper.Config = &config
+	}
+
+	output.Zypper = &zypper
+
+	return nil
+}
+
 func transformWireguard(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if model.Wireguard == nil {
 		return nil
@@ -939,6 +980,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformWireguard(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformZypper(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}
