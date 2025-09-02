@@ -209,6 +209,7 @@ The idea behind readiness probes is to ensure WireGuard connectivity before cont
 An edge device can’t access the internet but uses cloud-init modules which will install packages (e.g. landscape, packages, ubuntu_advantage). Those modules will fail due to missing internet connection. The wireguard module fixes that problem as it waits until all readiness probes (which can be arbitrary commands, e.g. checking if a proxy server is reachable over WireGuard network) are finished, before continuing the cloud-init config stage.
 
 >In order to use DNS with WireGuard you have to install the resolvconf package or symlink it to systemd’s resolvectl, otherwise wg-quick commands will throw an error message that executable resolvconf is missing, which leads the wireguard module to fail. (see [below for nested schema](#nestedblock--wireguard))
+- `write_files` (Block List) (see [below for nested schema](#nestedblock--write_files))
 - `zypper` (Block, Optional) Zypper behavior can be configured using the config key, which will modify /etc/zypp/zypp.conf. The configuration writer will only append the provided configuration options to the configuration file. Any duplicate options will be resolved by the way the zypp.conf INI file is parsed.
 
 > Setting configdir is not supported and will be skipped.
@@ -574,6 +575,30 @@ Optional:
 - `config_path` (String) Path to configuration file of Wireguard interface.
 - `content` (String) Wireguard interface configuration. Contains key, peer, …
 - `name` (String) Name of the interface. Typically wgx (example: wg0).
+
+
+
+<a id="nestedblock--write_files"></a>
+### Nested Schema for `write_files`
+
+Optional:
+
+- `append` (Boolean) Whether to append content to existing file if path exists. Default: false.
+- `content` (String) Optional content to write to the provided path. When content is present and encoding is not ‘text/plain’, decode the content prior to writing. Default: ''.
+- `defer` (Boolean) Defer writing the file until ‘final’ stage, after users were created, and packages were installed. Default: false.
+- `encoding` (String) Optional encoding type of the content. Default: text/plain. No decoding is performed by default. Supported encoding types are: `gz, gzip, gz+base64, gzip+base64, gz+b64, gzip+b64, b64, base64`.
+- `owner` (String) Optional owner:group to chown on the file and new directories. Default: `root:root`.
+- `path` (String) Path of the file to which **content** is decoded and written.
+- `permissions` (String) Optional file permissions to set on path represented as an octal string ‘0###’. Default: `0o644`.
+- `source` (Block, Optional) Optional specification for content loading from an arbitrary URI (see [below for nested schema](#nestedblock--write_files--source))
+
+<a id="nestedblock--write_files--source"></a>
+### Nested Schema for `write_files.source`
+
+Optional:
+
+- `headers` (Map of String) Optional HTTP headers to accompany load request, if applicable.
+- `uri` (String) URI from which to load file content. If loading fails repeatedly, content is used instead.
 
 
 

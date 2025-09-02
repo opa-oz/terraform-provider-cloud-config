@@ -167,7 +167,7 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 					knownvalue.Bool(false),
 				))
 			default:
-				if utils.IsNumeric(val) {
+				if utils.IsNumeric(val) && val[0] != '0' {
 					nVal, _ := strconv.ParseFloat(val, 64)
 					checks = append(checks, statecheck.ExpectKnownValue(
 						resourceName,
@@ -201,6 +201,98 @@ func assembleTestCase(testCases []testCase, t *testing.T) resource.TestCase {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps:                    steps,
 	}
+}
+
+func TestWriteFilesModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+write_files {
+      encoding = "b64"
+      content = "filecontent"
+      owner = "root:root"
+      path = "/etc/sysconf/selinux"
+      permissions = "0644"
+}
+
+write_files {
+      content = "15 * * * * root ship_logs"
+      path = "/etc/crontab"
+      append = true
+
+      source {
+        uri = "https://gitlab.example.com/some_ci_job/artifacts/hello"
+        headers = {
+            "Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
+            "User-Agent": "cloud-init on myserver.example.com",
+        }
+      }
+}
+
+write_files {
+      path = "/etc/nginx/conf.d/example.com.conf"
+      content = "server {}"
+      owner = "nginx:nginx"
+      permissions = "0640"
+      defer = true
+}
+      `,
+			expectedValues: map[string]string{
+				"write_files.0.encoding":                     "b64",
+				"write_files.0.content":                      "filecontent",
+				"write_files.0.owner":                        "root:root",
+				"write_files.0.path":                         "/etc/sysconf/selinux",
+				"write_files.0.permissions":                  "0644",
+				"write_files.1.content":                      "15 * * * * root ship_logs",
+				"write_files.1.path":                         "/etc/crontab",
+				"write_files.1.append":                       "true",
+				"write_files.1.source.uri":                   "https://gitlab.example.com/some_ci_job/artifacts/hello",
+				"write_files.1.source.headers.Authorization": "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==",
+				"write_files.1.source.headers.User-Agent":    "cloud-init on myserver.example.com",
+				"write_files.2.path":                         "/etc/nginx/conf.d/example.com.conf",
+				"write_files.2.content":                      "server {}",
+				"write_files.2.owner":                        "nginx:nginx",
+				"write_files.2.permissions":                  "0640",
+				"write_files.2.defer":                        "true",
+			},
+			expectedOutput: `
+write_files:
+    - path: /etc/sysconf/selinux
+      content: filecontent
+      owner: root:root
+      permissions: "0644"
+      encoding: b64
+    - path: /etc/crontab
+      content: 15 * * * * root ship_logs
+      append: true
+      source:
+        uri: https://gitlab.example.com/some_ci_job/artifacts/hello
+        headers:
+            Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+            User-Agent: cloud-init on myserver.example.com
+    - path: /etc/nginx/conf.d/example.com.conf
+      content: server {}
+      owner: nginx:nginx
+      permissions: "0640"
+      defer: true
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
 }
 
 func TestZypperModule(t *testing.T) {

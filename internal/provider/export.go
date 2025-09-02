@@ -33,6 +33,59 @@ func castArray[T any](ctx context.Context, arr types.List) (*[]T, diag.Diagnosti
 	return nil, nil
 }
 
+func transformWriteFiles(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.WriteFiles.IsUnknown() {
+		return nil
+	}
+	length := len(model.WriteFiles.Elements())
+	if length == 0 {
+		return nil
+	}
+
+	writeFiles := make([]ccmodules.WriteFileOutput, length)
+	res, diagnostics := castArray[ccmodules.WriteFile](ctx, model.WriteFiles)
+
+	if diagnostics.HasError() {
+		return diagnostics
+	}
+
+	for k, v := range *res {
+		item := ccmodules.WriteFileOutput{
+			Path:        v.Path.ValueString(),
+			Content:     v.Content.ValueString(),
+			Owner:       v.Owner.ValueString(),
+			Permissions: v.Permissions.ValueString(),
+			Encoding:    v.Encoding.ValueString(),
+			Append:      v.Append.ValueBool(),
+			Defer:       v.Defer.ValueBool(),
+		}
+
+		if v.Source != nil {
+			src := ccmodules.WriteFileSourceOutput{
+				URI: v.Source.URI.ValueString(),
+			}
+
+			if !v.Source.Headers.IsUnknown() {
+				config := make(map[string]string)
+
+				diagnostics := v.Source.Headers.ElementsAs(ctx, &config, false)
+				if diagnostics.HasError() {
+					return diagnostics
+				}
+
+				src.Headers = &config
+			}
+
+			item.Source = &src
+		}
+
+		writeFiles[k] = item
+	}
+
+	output.WriteFiles = &writeFiles
+	return nil
+}
+
 func transformZypper(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
 	if model.Zypper == nil {
 		return nil
@@ -985,6 +1038,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformZypper(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformWriteFiles(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}
