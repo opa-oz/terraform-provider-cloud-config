@@ -1,0 +1,37 @@
+[tools]
+golang = "1.24.3"
+golangci-lint = "2.7.1"
+terraform = "1.14.0"
+
+[tasks.build]
+description = "Build the provider"
+run = "go build -v ./..."
+
+[tasks.install]
+description = "Install the provider"
+depends = ["build"]
+run = "go install -v ./..."
+
+[tasks.lint]
+description = "Run linters"
+run = "golangci-lint run"
+
+[tasks.fmt]
+description = "Format code"
+run = "gofmt -s -w -e ."
+
+[tasks.test]
+description = "Run unit tests"
+run = "go test -v -cover -timeout=120s -parallel=10 ./..."
+
+[tasks.testacc]
+description = "Run acceptance tests"
+run = "TF_ACC=1 go test -v -cover -timeout 120m ./..."
+
+[tasks.generate]
+description = "Generate documentation"
+run = "cd tools && go generate ./..."
+
+[tasks.default]
+description = "Default task: format, lint, install and generate"
+depends = ["fmt", "lint", "install", "generate"]
