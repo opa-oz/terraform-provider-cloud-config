@@ -886,6 +886,22 @@ func transformPhoneHome(ctx context.Context, output *ExportModel, model CloudCon
 	return nil
 }
 
+func transformSpacewalk(ctx context.Context, output *ExportModel, model CloudConfigResourceModel) diag.Diagnostics {
+	if model.Spacewalk == nil {
+		return nil
+	}
+
+	config := ccmodules.SpacewalkOutput{}
+
+	config.Server = model.Spacewalk.Server.ValueString()
+	config.Proxy = model.Spacewalk.Proxy.ValueString()
+	config.ActivationKey = model.Spacewalk.ActivationKey.ValueString()
+
+	output.Spacewalk = &config
+
+	return nil
+}
+
 func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel, diag.Diagnostics) {
 	output := ExportModel{}
 
@@ -1043,6 +1059,11 @@ func transform(ctx context.Context, model CloudConfigResourceModel) (ExportModel
 	}
 
 	diagnostics = transformWriteFiles(ctx, &output, model)
+	if diagnostics.HasError() {
+		return output, diagnostics
+	}
+
+	diagnostics = transformSpacewalk(ctx, &output, model)
 	if diagnostics.HasError() {
 		return output, diagnostics
 	}

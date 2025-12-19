@@ -2019,3 +2019,43 @@ ssh_authorized_keys:
 
 	resource.Test(t, assembleTestCase(testCases, t))
 }
+
+func TestSpacewalkModule(t *testing.T) {
+	testCases := []testCase{
+		{
+			name: "Basic",
+			input: `
+spacewalk {
+  server = "http://example.com/{{ v1.instance_id }}/"
+  proxy = "http://example.com/{{ v1.instance_id }}/"
+  activation_key = "my_key"
+}
+      `,
+			expectedValues: map[string]string{
+				"spacewalk.server":         "http://example.com/{{ v1.instance_id }}/",
+				"spacewalk.proxy":          "http://example.com/{{ v1.instance_id }}/",
+				"spacewalk.activation_key": "my_key",
+			},
+			expectedOutput: `
+spacewalk:
+    server: http://example.com/{{ v1.instance_id }}/
+    proxy: http://example.com/{{ v1.instance_id }}/
+    activation_key: my_key 
+		`},
+		{
+			name: "Fail in older versions because `chapasswd` block needs to be deleted",
+			input: `
+ssh_authorized_keys = [ "ssh key" ]
+			`,
+			expectedValues: map[string]string{
+				"ssh_authorized_keys.0": "ssh key",
+			},
+			expectedOutput: `
+ssh_authorized_keys:
+    - ssh key 
+			`,
+		},
+	}
+
+	resource.Test(t, assembleTestCase(testCases, t))
+}

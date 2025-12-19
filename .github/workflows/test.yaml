@@ -42,15 +42,16 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
+      - uses: jdx/mise-action@v2
       # We need the latest version of Terraform for our documentation generation to use
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
           terraform_wrapper: false
-      - run: make generate
+      - run: mise run generate
       - name: git diff
         run: |
           git diff --compact-summary --exit-code || \
-            (echo; echo "Unexpected difference in directories after code generation. Run 'make generate' command and commit."; exit 1)
+            (echo; echo "Unexpected difference in directories after code generation. Run 'mise run generate' command and commit."; exit 1)
 
   # Run acceptance tests in a matrix with Terraform CLI versions
   test:

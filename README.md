@@ -5,7 +5,7 @@
 [![Terraform registry](https://img.shields.io/badge/terraform-registry-623CE4.svg?style=flat-square&logo=terraform)](https://registry.terraform.io/providers/opa-oz/cloud-config)
 [![OpenTofu Registry](https://img.shields.io/badge/opentofu-registry-yellow.svg)](https://search.opentofu.org/provider/opa-oz/cloud-config)
 
-Better than `yamlencode` (IMO)
+Better than `yamlencode` (IMHO)
 
 ## Motivation
 
@@ -126,14 +126,14 @@ If you wish to work on the provider, you'll first need [Go](http://www.golang.or
 
 To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
 
-To generate or update documentation, run `make generate`.
+To generate or update documentation, run `mise run generate`.
 
-In order to run the full suite of Acceptance tests, run `make testacc`.
+In order to run the full suite of Acceptance tests, run `mise run testacc`.
 
 *Note:* Acceptance tests create real resources, and often cost money to run.
 
 ```shell
-make testacc
+mise run testacc
 ```
 
 ## Module support
@@ -141,7 +141,7 @@ make testacc
 CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#module-reference)).
 
 
-**Progress: 49%**
+**Progress: 50%**
 `[███████████████————————————]`
 
 | Module             | Support        | Notes                |
@@ -189,7 +189,7 @@ CloudInit has a lot of modules ([https://cloudinit.readthedocs.io/en/latest/refe
 | Set Hostname        | **Full**            |                       |
 | Set Passwords      | _Partial_            |    Mostly supported, lacking validation                   |
 | Snap               | TBD            |                       |
-| Spacewalk          | TBD            |                       |
+| Spacewalk          | **Full**            |                       |
 | SSH                | _Partial_            |         Only `ssh_authorized_keys` is supported              |
 | SSH AuthKey Fingerprints | TBD            |                       |
 | SSH Import ID      | TBD            |                       |
